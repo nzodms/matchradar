@@ -1,0 +1,27 @@
+{
+  "name": "nonoise-extension",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NoNoise — a local-first browser extension that cleans the web: ads, trackers, popups, overlays and distractions.",
+  "type": "module",
+  "scripts": {
+    "build": "npm run build:ui && npm run build:sw && npm run build:content && node scripts/copy-static.mjs",
+    "build:ui": "vite build --mode ui",
+    "build:sw": "vite build --mode sw",
+    "build:content": "vite build --mode content",
+    "icons": "node scripts/make-icons.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/chrome": "0.0.280",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "@vitejs/plugin-react": "4.3.3",
+    "typescript": "5.6.3",
+    "vite": "5.4.11"
+  }
+}
