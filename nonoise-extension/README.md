@@ -5,6 +5,12 @@ Extension navigateur Manifest V3, **local-first** : pas de compte, pas de cloud,
 
 Compatible : **Chrome · Brave · Edge · Opera** (tout Chromium ≥ 121).
 
+**v1.1 — durcissement** : ~220 règles réseau (89 ads · 86 trackers · 43 gênes),
+sélecteurs cosmétiques élargis, stats par **catégorie** (pubs/trackers/gênes/
+popups/cookies/vidéo/scams/distractions), bouton **« Page issue »** (rapport
+copiable), **mode Debug** dans les Options (rulesets actifs, dernier nettoyage,
+éléments par catégorie, forçage du nettoyage).
+
 ---
 
 ## Installation (build local)
@@ -30,6 +36,59 @@ Puis dans le navigateur :
 - **Modes** : *Clean* (essentiel) · *Focus* (Clean + feeds/prompts/distractions) · *Video Clean* (Clean + ruleset vidéo + cosmétique des lecteurs compatibles).
 - **Règle scam (démo non destructive)** : visite `https://scam-demo.nonoise.invalid` → navigation bloquée par le ruleset `scams` (domaine volontairement factice).
 - **Options** : whitelist/blacklist, sélecteurs CSS personnalisés (un par ligne, masqués partout), export/import JSON, reset stats.
+
+## Checklist de tests manuels
+
+À dérouler après chaque `npm run build` + reload de l'extension. Coche au fur et à mesure.
+
+**Installation**
+- [ ] `npm install && npm run build` se termine sans erreur.
+- [ ] `Load unpacked` sur `dist/` charge l'extension sans avertissement de manifest.
+- [ ] L'icône NoNoise apparaît, la popup s'ouvre, la page Options s'ouvre.
+
+**Sites de presse lourds** (lemonde.fr, lefigaro.fr, forbes.com, cnn.com)
+- [ ] Les emplacements pub sont vides/masqués, la mise en page tient.
+- [ ] Le badge de l'icône monte (requêtes bloquées sur l'onglet).
+- [ ] La popup incrémente « pubs bloquées » et « trackers bloqués ».
+
+**Cookie banners** (la plupart des sites EU : OneTrust, Didomi, Cookiebot, Quantcast…)
+- [ ] Le bandeau disparaît, le scroll de la page n'est pas bloqué.
+- [ ] Catégorie « Cookie banners » > 0 dans le détail popup / Debug.
+
+**Popups newsletter** (sites e-commerce / blogs : Privy, Mailchimp, OptinMonster…)
+- [ ] La modale newsletter ne reste pas affichée.
+- [ ] Catégorie « Popups » > 0.
+
+**Sites e-commerce** (amazon.*, fnac.com, une boutique Shopify)
+- [ ] **Aucune casse** : header, recherche, fiche produit, **panier**, **checkout**, **login** intacts.
+- [ ] Le site reste navigable et achetable de bout en bout.
+
+**Plateforme vidéo compatible** (Mode *Video Clean*)
+- [ ] Active *Video Clean* dans la popup.
+- [ ] Sur une grande plateforme vidéo, les overlays pub du lecteur sont masqués ; la lecture du contenu fonctionne.
+- [ ] La catégorie « Vidéo » bouge. _(Note : la pub insérée côté serveur reste hors de portée — voir Limites.)_
+
+**Pause par site / whitelist**
+- [ ] Popup → « Mettre en pause sur ce domaine » → recharge : pubs/éléments réapparaissent.
+- [ ] Options → le domaine est listé dans « Sites en pause ».
+- [ ] « Réactiver » (popup) ou suppression (options) → le nettoyage reprend après reload.
+
+**Modes**
+- [ ] *Clean* : pubs + trackers + popups + cookies.
+- [ ] *Focus* : en plus, les feeds/shelves de distraction listés disparaissent.
+- [ ] *Video Clean* : en plus, le ruleset vidéo s'active (vérifiable dans Options → Debug → « Rulesets réseau actifs »).
+
+**Import / export / reset**
+- [ ] Options → « Exporter les réglages » télécharge un JSON.
+- [ ] « Importer » recharge whitelist/blacklist/sélecteurs/mode.
+- [ ] « Réinitialiser les stats » remet tous les compteurs (et catégories) à zéro.
+
+**Rapport « Page issue »**
+- [ ] Popup → « Page issue » copie un rapport (URL, domaine, mode, stats page+totales, catégories, user agent, date).
+
+**Debug (Options)**
+- [ ] Affiche les rulesets actifs, le mode, le statut whitelist et le dernier nettoyage DOM de la page active.
+- [ ] « Forcer le nettoyage de la page » relance un sweep et met à jour les compteurs par catégorie.
 
 ## Voir les règles actives / debugger
 

@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { baseDomain } from "@/shared/domains";
 import { MODES, type Mode } from "@/shared/modes";
-import { resetStats } from "@/shared/stats";
+import { CATEGORIES, CATEGORY_LABELS, resetStats, type Category } from "@/shared/stats";
 import {
   exportSettings,
   getSettings,
@@ -63,6 +63,130 @@ function DomainList({
         </button>
       </div>
     </>
+  );
+}
+
+interface DebugInfo {
+  domain: string;
+  active: boolean;
+  whitelisted: boolean;
+  mode: Mode | null;
+  lastCleanAt: number;
+  totals: Partial<Record<Category, number>>;
+}
+
+async function activeWebTab(): Promise<chrome.tabs.Tab | null> {
+  // The options page is its own tab; find the active http(s) tab instead.
+  const tabs = await chrome.tabs.query({ active: true });
+  return tabs.find((t) => /^https?:/.test(t.url ?? "")) ?? null;
+}
+
+function relativeTime(ts: number): string {
+  if (!ts) return "jamais";
+  const s = Math.round((Date.now() - ts) / 1000);
+  if (s < 5) return "à l'instant";
+  if (s < 60) return `il y a ${s}s`;
+  return `il y a ${Math.round(s / 60)} min`;
+}
+
+function DebugPanel() {
+  const [info, setInfo] = useState<DebugInfo | "unavailable" | null>(null);
+  const [rulesets, setRulesets] = useState<string[]>([]);
+  const [tabTitle, setTabTitle] = useState<string>("");
+
+  const load = useCallback(async () => {
+    try {
+      setRulesets(await chrome.declarativeNetRequest.getEnabledRulesets());
+    } catch {
+      setRulesets([]);
+    }
+    const tab = await activeWebTab();
+    setTabTitle(tab?.title ?? tab?.url ?? "");
+    if (!tab?.id) {
+      setInfo("unavailable");
+      return;
+    }
+    try {
+      setInfo((await chrome.tabs.sendMessage(tab.id, { type: "nonoise:getDebug" })) as DebugInfo);
+    } catch {
+      setInfo("unavailable");
+    }
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const force = async () => {
+    const tab = await activeWebTab();
+    if (tab?.id) {
+      try {
+        await chrome.tabs.sendMessage(tab.id, { type: "nonoise:forceClean" });
+      } catch {
+        /* no content script on that page */
+      }
+    }
+    await load();
+  };
+
+  return (
+    <div className="card">
+      <h2>Debug</h2>
+      <p className="hint">État en direct de la page active du navigateur (pas cet onglet d'options).</p>
+
+      <div className="kv">
+        <span>Rulesets réseau actifs</span>
+        <code>{rulesets.length ? rulesets.join(", ") : "aucun"}</code>
+      </div>
+
+      {info === null && <div className="empty">Chargement…</div>}
+      {info === "unavailable" && (
+        <div className="empty">Aucune page web active détectée (ouvre un site http/https dans un onglet).</div>
+      )}
+      {info && info !== "unavailable" && (
+        <>
+          <div className="kv">
+            <span>Page</span>
+            <code title={tabTitle}>{info.domain}</code>
+          </div>
+          <div className="kv">
+            <span>Nettoyage actif ici</span>
+            <code>{info.active ? "oui" : "non"}</code>
+          </div>
+          <div className="kv">
+            <span>Domaine whitelisté</span>
+            <code>{info.whitelisted ? "oui" : "non"}</code>
+          </div>
+          <div className="kv">
+            <span>Mode</span>
+            <code>{info.mode ? MODES[info.mode].label : "—"}</code>
+          </div>
+          <div className="kv">
+            <span>Dernier nettoyage DOM</span>
+            <code>{relativeTime(info.lastCleanAt)}</code>
+          </div>
+          <div className="kv kv-top">
+            <span>Éléments retirés (cette page)</span>
+            <code>
+              {CATEGORIES.filter((c) => (info.totals[c] ?? 0) > 0).length === 0
+                ? "0"
+                : CATEGORIES.filter((c) => (info.totals[c] ?? 0) > 0)
+                    .map((c) => `${CATEGORY_LABELS[c]} ${info.totals[c]}`)
+                    .join(" · ")}
+            </code>
+          </div>
+        </>
+      )}
+
+      <div className="actions" style={{ marginTop: 12 }}>
+        <button type="button" className="btn" onClick={() => void force()}>
+          Forcer le nettoyage de la page
+        </button>
+        <button type="button" className="btn ghost" onClick={() => void load()}>
+          Rafraîchir
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -198,6 +322,8 @@ function App() {
           {note && <span className="ok-note" style={{ alignSelf: "center" }}>{note}</span>}
         </div>
       </div>
+
+      <DebugPanel />
 
       <div className="card">
         <h2>Données</h2>

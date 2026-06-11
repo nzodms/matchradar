@@ -25,6 +25,15 @@ const ADS = [
   "perfectaudience.com", "quantcast.com", "spotxchange.com", "yieldlab.net",
   "improvedigital.com", "smaato.net", "inmobi.com", "applovin.com", "unityads.unity3d.com",
   "popads.net", "propellerads.com", "exoclick.com", "juicyads.com", "adcash.com",
+  // exchanges, SSPs & networks
+  "contextweb.com", "districtm.io", "indexww.com", "advertising.com", "adtechus.com",
+  "rfihub.com", "simpli.fi", "stackadapt.com", "nativo.com", "powerlinks.com",
+  "adingo.jp", "adhigh.net", "adkernel.com", "admixer.net", "adtelligent.com",
+  "loopme.com", "pubnative.net", "smartyads.com", "vidoomy.com", "richaudience.com",
+  "onetag.com", "rtbhouse.com", "yieldmo.com", "districtm.net", "media6degrees.com",
+  "servedbyadbutler.com", "adzerk.net", "kevel.co", "adblade.com", "adsterra.com",
+  "hilltopads.net", "clickadu.com", "trafficstars.com", "mediavine.com", "adthrive.com",
+  "ezoic.net", "ezoic.com", "playwire.com", "freestar.com", "monetag.com",
 ];
 
 // ───────────────────────── Trackers & analytics ─────────────────────────
@@ -37,6 +46,16 @@ const TRACKERS = [
   "mathtag.com", "bidr.io", "crwdcntrl.net", "exelator.com", "narrative.io",
   "permutive.com", "parsely.com", "newrelic.com", "bat.bing.com", "mc.yandex.ru",
   "matomo.cloud", "plausible.io", "luckyorange.com", "crazyegg.com", "inspectlet.com",
+  // product / marketing analytics & data brokers
+  "heap.io", "heapanalytics.com", "pendo.io", "logrocket.com", "logrocket.io",
+  "statcounter.com", "woopra.com", "kissmetrics.io", "customer.io", "june.so",
+  "posthog.com", "i.posthog.com", "rudderstack.com", "rudderlabs.com", "snowplowanalytics.com",
+  "tealiumiq.com", "ensighten.com", "signal.co", "marketo.com", "marketo.net",
+  "pardot.com", "omtrdc.net", "2o7.net", "adobedtm.com", "optimizely.com",
+  "visualwebsiteoptimizer.com", "dynamicyield.com", "monetate.net", "cdn.heapanalytics.com",
+  "track.hubspot.com", "forms.hubspot.com", "cdn.mxpnl.com", "api.mixpanel.com",
+  "cdn.segment.com", "api.segment.io", "sb.scorecardresearch.com", "smetrics.com",
+  "yieldify.com", "cxense.com", "lytics.io", "sailthru.com", "bronto.com",
 ];
 
 // Path-based tracker scripts (urlFilter on path, any domain).
@@ -50,6 +69,13 @@ const ANNOYANCES = [
   "webpushr.com", "pushwoosh.com", "privy.com", "justuno.com", "optinmonster.com",
   "sumo.com", "mailmunch.co", "sleeknote.com", "getsitecontrol.com", "wisepops.com",
   "poptin.com", "hellobar.com", "intercomcdn.com",
+  // more push/popup/chat-nag vendors
+  "vwo.com", "sleeknotecustomerscripts.com", "getbeamer.com", "beamer.io",
+  "useinsider.com", "insitez.com", "cdn.optinmonster.com", "app.getsitecontrol.com",
+  "cdn.privy.com", "widget.privy.com", "popupsmart.com", "convertflow.com",
+  "smartsupp.com", "tawk.to", "tidio.co",
+  "livechatinc.com", "purechat.com", "crisp.chat", "drift.com", "driftt.com",
+  "wisepops.net", "klaviyo.com", "static.klaviyo.com", "cdn.tinypass.com", "tinypass.com",
 ];
 
 // ───────────────────────── Scams (demo + known malvertising) ─────────────────────────

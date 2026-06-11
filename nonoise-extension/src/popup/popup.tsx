@@ -3,6 +3,8 @@ import { createRoot } from "react-dom/client";
 import { domainFromUrl } from "@/shared/domains";
 import { MODES, type Mode } from "@/shared/modes";
 import {
+  CATEGORIES,
+  CATEGORY_LABELS,
   estimatedSecondsSaved,
   formatDuration,
   getStats,
@@ -32,10 +34,39 @@ function Logo() {
   );
 }
 
+function buildReport(args: {
+  url: string;
+  domain: string | null;
+  settings: Settings;
+  stats: Stats;
+}): string {
+  const { url, domain, settings, stats } = args;
+  const d = domain ? stats.byDomain[domain] : undefined;
+  const paused = domain ? settings.whitelist.includes(domain) : false;
+  const lines = [
+    "NoNoise — rapport de page",
+    `URL          : ${url}`,
+    `Domaine      : ${domain ?? "—"}`,
+    `Mode actif   : ${MODES[settings.mode].label} (${settings.mode})`,
+    `Protection   : ${settings.enabled ? "globale ON" : "globale OFF"} · ${paused ? "EN PAUSE sur ce site" : "active sur ce site"}`,
+    `Whitelist    : ${paused ? "oui" : "non"}`,
+    `Stats site   : ${d ? `${d.ads} pubs · ${d.trackers} trackers · ${d.cleaned} nettoyés` : "aucune activité"}`,
+    `Stats totales: ${stats.adsBlocked} pubs · ${stats.trackersBlocked} trackers · ${stats.elementsCleaned} nettoyés`,
+    `Catégories   : ${CATEGORIES.map((c) => `${CATEGORY_LABELS[c]} ${stats.categories[c]}`).join(" · ")}`,
+    `Version      : NoNoise v${chrome.runtime.getManifest().version}`,
+    `User agent   : ${navigator.userAgent}`,
+    `Date         : ${new Date().toISOString()}`,
+  ];
+  return lines.join("\n");
+}
+
 function App() {
   const [settings, setLocal] = useState<Settings | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [domain, setDomain] = useState<string | null>(null);
+  const [url, setUrl] = useState("");
+  const [showBreakdown, setShowBreakdown] = useState(false);
+  const [reported, setReported] = useState(false);
 
   useEffect(() => {
     void getSettings().then(setLocal);
@@ -43,6 +74,7 @@ function App() {
     onSettingsChanged(setLocal);
     onStatsChanged(setStats);
     void chrome.tabs.query({ active: true, currentWindow: true }).then(([tab]) => {
+      setUrl(tab?.url ?? "");
       setDomain(domainFromUrl(tab?.url));
     });
   }, []);
@@ -56,18 +88,27 @@ function App() {
 
   if (!settings || !stats) return <div className="wrap">…</div>;
 
+  const report = async () => {
+    try {
+      await navigator.clipboard.writeText(buildReport({ url, domain, settings, stats }));
+      setReported(true);
+      setTimeout(() => setReported(false), 2000);
+    } catch {
+      setReported(false);
+    }
+  };
+
   return (
     <div className="wrap">
       <div className="header">
         <Logo />
-        <div>
+        <div className="header-text">
           <div className="title">NoNoise</div>
           <div className="domain">{domain ?? "Page non nettoyable"}</div>
         </div>
         <button
           type="button"
           className="switch"
-          style={{ marginLeft: "auto" }}
           data-on={settings.enabled}
           aria-label="Activer / désactiver NoNoise"
           onClick={() => void setSettings({ enabled: !settings.enabled })}
@@ -80,7 +121,7 @@ function App() {
           <div className="sub">
             {domain
               ? protectedHere
-                ? `Réseau + nettoyage actifs${domainStats ? ` · ${domainStats.ads + domainStats.trackers + domainStats.cleaned} éléments ici` : ""}`
+                ? `Réseau + nettoyage actifs${domainStats ? ` · ${domainStats.ads + domainStats.trackers + domainStats.cleaned} ici` : ""}`
                 : settings.enabled
                   ? "En pause sur ce domaine"
                   : "NoNoise est désactivé"
@@ -108,9 +149,24 @@ function App() {
         </div>
         <div className="stat">
           <b>{formatDuration(estimatedSecondsSaved(stats))}</b>
-          <span>temps gagné (estimation)</span>
+          <span>temps gagné (est.)</span>
         </div>
       </div>
+
+      <button type="button" className="disclosure" onClick={() => setShowBreakdown((v) => !v)}>
+        <span>Détail par catégorie</span>
+        <span className={`chev ${showBreakdown ? "open" : ""}`}>›</span>
+      </button>
+      {showBreakdown && (
+        <div className="breakdown">
+          {CATEGORIES.map((c) => (
+            <div key={c} className="bd-item">
+              <span>{CATEGORY_LABELS[c]}</span>
+              <b>{stats.categories[c].toLocaleString("fr-FR")}</b>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="modes">
         {(Object.keys(MODES) as Mode[]).map((m) => (
@@ -142,8 +198,11 @@ function App() {
         <button type="button" className="link" onClick={() => void chrome.runtime.openOptionsPage()}>
           Options
         </button>
-        <span className="muted-note">Local-first · v{chrome.runtime.getManifest().version}</span>
+        <button type="button" className="link" onClick={() => void report()} disabled={!domain}>
+          {reported ? "Rapport copié ✓" : "Page issue"}
+        </button>
       </div>
+      <div className="note-row">Local-first · v{chrome.runtime.getManifest().version}</div>
     </div>
   );
 }

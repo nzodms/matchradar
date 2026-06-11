@@ -1,6 +1,6 @@
 import { domainFromUrl } from "@/shared/domains";
 import { RULESETS, rulesetsForMode, type RulesetId } from "@/shared/modes";
-import { addStats, isCleanedMessage } from "@/shared/stats";
+import { addStats, isCleanedMessage, sumCategories, type Category } from "@/shared/stats";
 import { getSettings, onSettingsChanged, type Settings } from "@/shared/storage";
 
 /**
@@ -14,7 +14,23 @@ import { getSettings, onSettingsChanged, type Settings } from "@/shared/storage"
  *  5. Show a per-tab blocked counter on the action badge.
  */
 
-const AD_RULESETS: ReadonlySet<string> = new Set(["ads", "annoyances", "scams", "video"]);
+/** Maps a matched ruleset to a top-line bucket + a fine-grained category. */
+function categorize(rulesetId: string): { ads: number; trackers: number; category: Category | null } {
+  switch (rulesetId) {
+    case "trackers":
+      return { ads: 0, trackers: 1, category: "trackers" };
+    case "ads":
+      return { ads: 1, trackers: 0, category: "ads" };
+    case "annoyances":
+      return { ads: 1, trackers: 0, category: "annoyances" };
+    case "scams":
+      return { ads: 1, trackers: 0, category: "scams" };
+    case "video":
+      return { ads: 1, trackers: 0, category: "video" };
+    default:
+      return { ads: 0, trackers: 0, category: null };
+  }
+}
 
 /* ───────────────────────── Ruleset sync ───────────────────────── */
 
@@ -95,12 +111,6 @@ interface MatchedRuleInfo {
   rule: { rulesetId: string; ruleId: number };
 }
 
-function categorize(rulesetId: string): { ads: number; trackers: number } {
-  if (rulesetId === "trackers") return { ads: 0, trackers: 1 };
-  if (AD_RULESETS.has(rulesetId)) return { ads: 1, trackers: 0 };
-  return { ads: 0, trackers: 0 };
-}
-
 const debugEvent = (
   chrome.declarativeNetRequest as unknown as {
     onRuleMatchedDebug?: { addListener: (cb: (info: MatchedRuleInfo) => void) => void };
@@ -112,10 +122,10 @@ if (debugEvent) {
   // Only fires for unpacked installs — gives exact, per-request counts.
   exactCounting = true;
   debugEvent.addListener((info) => {
-    const { ads, trackers } = categorize(info.rule.rulesetId);
+    const { ads, trackers, category } = categorize(info.rule.rulesetId);
     if (ads + trackers === 0) return;
     const domain = domainFromUrl(info.request.initiator) ?? domainFromUrl(info.request.url);
-    void addStats({ ads, trackers, domain });
+    void addStats({ ads, trackers, categories: category ? { [category]: 1 } : undefined, domain });
     if (info.request.tabId >= 0) {
       const next = (tabBlockCounts.get(info.request.tabId) ?? 0) + 1;
       tabBlockCounts.set(info.request.tabId, next);
@@ -139,12 +149,14 @@ async function sampleMatchedRules(): Promise<void> {
     lastSampleTs = Date.now();
     let ads = 0;
     let trackers = 0;
+    const categories: Partial<Record<Category, number>> = {};
     for (const m of fresh) {
       const c = categorize(m.rule.rulesetId);
       ads += c.ads;
       trackers += c.trackers;
+      if (c.category) categories[c.category] = (categories[c.category] ?? 0) + 1;
     }
-    if (ads + trackers > 0) await addStats({ ads, trackers, domain: null });
+    if (ads + trackers > 0) await addStats({ ads, trackers, categories, domain: null });
   } catch {
     // Quota exhausted or feedback permission unavailable — skip this sample.
   }
@@ -159,7 +171,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (isCleanedMessage(msg)) {
-    void addStats({ cleaned: msg.count, domain: msg.domain });
+    void addStats({ cleaned: sumCategories(msg.byCategory), categories: msg.byCategory, domain: msg.domain });
     sendResponse({ ok: true });
   }
   return false;
