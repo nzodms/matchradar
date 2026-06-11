@@ -24,10 +24,15 @@ export function getHydratedMatch(id: string): HydratedMatch | undefined {
 
 const ALL: HydratedMatch[] = MATCHES.map(hydrate);
 
+/** A match currently being played (live or at the break). */
+export function isLiveNow(m: HydratedMatch): boolean {
+  return m.status === "live" || m.status === "halftime";
+}
+
 /** Live first, then by hype. The signature sort of the whole app. */
 export function byHype(a: HydratedMatch, b: HydratedMatch): number {
-  if (a.status === "live" && b.status !== "live") return -1;
-  if (b.status === "live" && a.status !== "live") return 1;
+  if (isLiveNow(a) && !isLiveNow(b)) return -1;
+  if (isLiveNow(b) && !isLiveNow(a)) return 1;
   return b.hypeScore - a.hypeScore;
 }
 
@@ -50,7 +55,7 @@ export function matchOfTheDay(): HydratedMatch {
 }
 
 export function liveMatches(): HydratedMatch[] {
-  return ALL.filter((m) => m.status === "live");
+  return ALL.filter(isLiveNow);
 }
 
 /** Matches involving any of the given team ids. */
@@ -221,11 +226,16 @@ export function buildDailyBrief(now = new Date()): DailyBrief {
   // Deterministic "fact of the day" so server and client agree.
   const fact = FUN_FACTS[new Date(now).getDate() % FUN_FACTS.length];
 
+  const channel = (m: HydratedMatch) => {
+    const b = m.broadcasters[0];
+    return b ? (b.verified ? ` sur ${b.name}` : ` sur ${b.name} (à confirmer)`) : "";
+  };
+
   const list = threeToWatch
     .map((m) =>
       m.status === "live"
-        ? `${m.home.name}–${m.away.name} est en live`
-        : `${m.home.name}–${m.away.name} à ${shortTime(m.time)}`,
+        ? `${m.home.name}–${m.away.name} est en live${channel(m)}`
+        : `${m.home.name}–${m.away.name} à ${shortTime(m.time)}${channel(m)}`,
     )
     .join(", ");
 

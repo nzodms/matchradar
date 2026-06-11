@@ -1,6 +1,7 @@
 "use client";
 
 import { useTimezone } from "@/components/Providers";
+import { broadcasterLabel } from "@/lib/data-sources/broadcastersProvider";
 import { displayTime } from "@/lib/datetime";
 import { getHypeTier } from "@/lib/hype";
 import { marketFavorite } from "@/lib/market";
@@ -63,7 +64,8 @@ export function HotMatchHero({ match, eyebrow = "Le match à ne pas rater ce soi
           {isLive ? <span className="text-danger">En direct</span> : time}
           {dayShift !== 0 && !isLive && <span className="text-faint"> ({dayShift > 0 ? "J+1" : "J-1"})</span>}
           <span className="text-faint"> · {match.round} · {match.city}</span>
-          {match.broadcasters[0] && <span className="text-faint"> · {match.broadcasters[0]}</span>}
+          <span className="text-faint"> · </span>
+          <span className="text-ink/90">{broadcasterLabel(match.broadcasters[0])}</span>
         </p>
 
         {/* verdict */}

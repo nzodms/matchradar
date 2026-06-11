@@ -15,40 +15,41 @@ import {
   Rocket,
   Siren,
   Trophy,
+  Tv,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
 
 const FEATURES: { icon: LucideIcon; accent: AccentToken; title: string; text: string }[] = [
   {
-    icon: Siren,
-    accent: "hype",
-    title: "Le match à ne pas rater chaque jour",
-    text: "Un verdict clair : si tu n'en regardes qu'un aujourd'hui, c'est celui-là.",
-  },
-  {
-    icon: Flame,
-    accent: "danger",
-    title: "Un score de hype clair",
-    text: "Enjeu, rivalité, stars, ambiance : chaque match noté sur 100. Fini de deviner.",
-  },
-  {
-    icon: Activity,
-    accent: "gold",
-    title: "Le Market Pulse en un coup d'œil",
-    text: "Cotes indicatives, favori, match serré ou piège : tu sais direct ce que vaut l'affiche.",
-  },
-  {
     icon: CalendarHeart,
     accent: "electric",
-    title: "Ton calendrier personnalisé",
-    text: "Ton pays, tes équipes, tes créneaux. Export Google et Apple en un tap.",
+    title: "Le programme du jour",
+    text: "Tous les matchs du jour, triés par heure, avec le niveau de hype de chacun.",
+  },
+  {
+    icon: Siren,
+    accent: "hype",
+    title: "Le match à ne pas rater",
+    text: "Un verdict clair chaque jour : si tu n'en regardes qu'un, c'est celui-là.",
+  },
+  {
+    icon: Tv,
+    accent: "danger",
+    title: "Les chaînes en un coup d'œil",
+    text: "TF1, beIN, streaming : tu sais direct où regarder, sans chercher.",
   },
   {
     icon: MessageCircle,
     accent: "hype",
-    title: "Un brief prêt à envoyer sur WhatsApp",
-    text: "Le résumé du jour, copié-collé dans le groupe. Tu passes pour le pro du foot.",
+    title: "Un brief prêt pour ton groupe",
+    text: "Programme, horaires, chaînes et verdict — copié-collé dans WhatsApp.",
+  },
+  {
+    icon: Activity,
+    accent: "gold",
+    title: "Le Market Pulse en bonus",
+    text: "Cotes indicatives, favori, match serré ou piège : la tension de l'affiche en un regard.",
   },
 ];
 
@@ -82,14 +83,14 @@ export default function LandingPage() {
             <span className="inline-flex items-center gap-1.5 rounded-full border border-hype/25 bg-hype/8 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-hype">
               <Trophy size={12} strokeWidth={2.4} /> Coupe du Monde · En direct
             </span>
-            <h1 className="mt-4 font-display text-[34px] font-bold leading-[1.05] tracking-tight text-ink">
-              Il y a trop de matchs.
+            <h1 className="mt-4 font-display text-[33px] font-bold leading-[1.06] tracking-tight text-ink">
+              Tu ne sais jamais quel match regarder ?
               <br />
-              <span className="text-gradient-hype">On te dit lesquels regarder.</span>
+              <span className="text-gradient-hype">MatchRadar te le dit.</span>
             </h1>
             <p className="mt-3 max-w-md text-[15px] leading-snug text-muted">
-              MatchRadar classe les matchs par hype, enjeu et intérêt réel pour te sortir les immanquables
-              du jour.
+              Horaires, chaînes, hype, enjeux et brief WhatsApp : chaque jour, les matchs qui valent
+              vraiment le coup.
             </p>
 
             <div className="mt-5 flex flex-col gap-2.5 sm:flex-row">
@@ -97,13 +98,13 @@ export default function LandingPage() {
                 href="/"
                 className="tap inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-hype font-display font-bold text-bg shadow-glow-hype"
               >
-                Voir le radar du jour <ArrowRight size={18} />
+                Voir les matchs du jour <ArrowRight size={18} />
               </Link>
               <Link
-                href="/calendar"
+                href="/brief"
                 className="tap inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-surface-2/50 font-display font-bold text-ink ring-1 ring-line/8"
               >
-                Créer mon calendrier
+                Recevoir le brief chaque matin
               </Link>
             </div>
 

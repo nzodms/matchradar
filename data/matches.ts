@@ -1,4 +1,4 @@
-import type { Match, OddsMeta } from "@/types";
+import type { Broadcaster, Match, OddsMeta } from "@/types";
 
 /**
  * Mocked Coupe du Monde fixtures (V2 — with Market Pulse).
@@ -20,7 +20,21 @@ export const ODDS_META: OddsMeta = {
   affiliateUrl: null,
 };
 
-export const MATCHES: Match[] = [
+/**
+ * Broadcaster helper. `verified: true` = manually curated entry the UI may show
+ * as certain; `verified: false` = the UI MUST render "à confirmer".
+ */
+const bc = (name: string, opts: Partial<Broadcaster> = {}): Broadcaster => ({
+  name,
+  country: "FR",
+  channelType: "tv",
+  verified: true,
+  ...opts,
+});
+
+type BaseFixture = Omit<Match, "stakesSummary" | "provenance">;
+
+const FIXTURES: BaseFixture[] = [
   // ───────────────────────────── AUJOURD'HUI ─────────────────────────────
   {
     id: "arg-por",
@@ -55,7 +69,7 @@ export const MATCHES: Match[] = [
     atStake: "Une place en demi-finale et la dernière danse de deux légendes. Le genre de match qu'on raconte pendant 20 ans.",
     whatsappBrief:
       "🚨 LE match de la journée : Argentine 🇦🇷 vs 🇵🇹 Portugal à 21h. Messi vs Ronaldo en quart de Mondial. Hype 96/100. Si tu ne regardes qu'un truc ce soir, c'est ça.",
-    broadcasters: ["TF1", "beIN Sports 1"],
+    broadcasters: [bc("TF1"), bc("beIN Sports 1")],
     verdict: "Si tu n'as qu'un match à regarder aujourd'hui, regarde celui-là. Le radar le classe immanquable.",
     odds: { home: 2.35, draw: 3.2, away: 2.8 },
     marketSignal: "affiche-brulante",
@@ -116,7 +130,7 @@ export const MATCHES: Match[] = [
     atStake: "Le Maroc peut encore écrire l'histoire du football africain. L'Espagne joue sa crédibilité de favori.",
     whatsappBrief:
       "🔴 EN DIRECT : Espagne 🇪🇸 1-1 🇲🇦 Maroc, 67e minute, ça brûle. Revanche de 2022, ambiance de folie. Hype 91/100. Allume vite.",
-    broadcasters: ["beIN Sports 1"],
+    broadcasters: [bc("beIN Sports 1")],
     verdict: "C'est en direct et c'est déjà bouillant. À regarder maintenant si tu es dispo.",
     odds: { home: 1.85, draw: 3.35, away: 4.2 },
     marketSignal: "outsider-dangereux",
@@ -173,7 +187,7 @@ export const MATCHES: Match[] = [
     atStake: "Une demi-finale pour la France. Pour le Sénégal, l'exploit qui marquerait toute une génération.",
     whatsappBrief:
       "🇫🇷 France vs 🇸🇳 Sénégal à 15h, quart de finale. Mbappé vs Mané. Les Bleus favoris mais ça peut piéger. Hype 87/100.",
-    broadcasters: ["TF1"],
+    broadcasters: [bc("TF1")],
     verdict: "Gros match de l'après-midi. À ne pas rater si tu suis les Bleus.",
     odds: { home: 1.62, draw: 3.8, away: 5.4 },
     marketSignal: "favori-clair",
@@ -230,7 +244,7 @@ export const MATCHES: Match[] = [
     atStake: "Un quart de finale, et pour les USA la chance de faire vibrer tout le pays hôte.",
     whatsappBrief:
       "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Angleterre vs 🇺🇸 USA à 23h30. Public en feu mais c'est tard. Match piège. Hype 72/100. Pour les couche-tard.",
-    broadcasters: ["beIN Sports 2"],
+    broadcasters: [bc("beIN Sports 2", { verified: false })],
     verdict: "Sympa mais tardif. À garder si tu tiens la nuit ou en replay demain.",
     odds: { home: 1.75, draw: 3.6, away: 4.6 },
     marketSignal: "favori-clair",
@@ -287,7 +301,7 @@ export const MATCHES: Match[] = [
     atStake: "Trois points et un bon départ dans le groupe pour le pays hôte.",
     whatsappBrief:
       "🇲🇽 Mexique vs 🇿🇦 Afrique du Sud à midi. Plutôt tranquille mais l'Azteca, ça reste mythique. Hype 48/100.",
-    broadcasters: ["beIN Sports 3"],
+    broadcasters: [bc("beIN Sports 3", { verified: false })],
     verdict: "À regarder surtout pour l'ambiance. Pas la priorité du jour.",
     odds: { home: 1.95, draw: 3.3, away: 3.9 },
     marketSignal: "ouverture-chaude",
@@ -347,7 +361,7 @@ export const MATCHES: Match[] = [
     atStake: "Une demi-finale et la revanche du traumatisme de 2014. Charge émotionnelle maximale.",
     whatsappBrief:
       "🇧🇷 Brésil vs 🇩🇪 Allemagne demain 21h. LA revanche du 7-1. Hype 95/100. Bloque ta soirée, c'est immanquable.",
-    broadcasters: ["TF1", "beIN Sports 1"],
+    broadcasters: [bc("TF1"), bc("beIN Sports 1")],
     verdict: "Le match à bloquer dans ton agenda dès maintenant. Immanquable.",
     odds: { home: 2.1, draw: 3.4, away: 3.1 },
     marketSignal: "match-serre",
@@ -404,7 +418,7 @@ export const MATCHES: Match[] = [
     atStake: "Le dernier tour de piste pour deux générations exceptionnelles.",
     whatsappBrief:
       "🇭🇷 Croatie vs 🇧🇪 Belgique demain 18h. Modrić vs De Bruyne, du très beau jeu. Hype 74/100.",
-    broadcasters: ["beIN Sports 1"],
+    broadcasters: [bc("beIN Sports 1")],
     verdict: "Pour les amateurs de jeu posé et de milieux de génie. Bon match.",
     odds: { home: 2.55, draw: 3.1, away: 2.85 },
     marketSignal: "match-serre",
@@ -461,7 +475,7 @@ export const MATCHES: Match[] = [
     atStake: "Un quart de finale, et pour le Japon une nouvelle étape vers le sommet asiatique.",
     whatsappBrief:
       "🇳🇱 Pays-Bas vs 🇯🇵 Japon demain 14h. Vrai match piège, le Japon peut surprendre. Hype 63/100.",
-    broadcasters: ["beIN Sports 2"],
+    broadcasters: [bc("beIN Sports 2", { verified: false })],
     verdict: "Match piège de l'après-midi. À suivre si tu aimes les surprises.",
     odds: { home: 1.7, draw: 3.7, away: 4.8 },
     marketSignal: "piege-possible",
@@ -520,7 +534,7 @@ export const MATCHES: Match[] = [
     atStake: "Une demi-finale pour deux nations qui savent gagner les matchs serrés.",
     whatsappBrief:
       "🇮🇹 Italie vs 🇺🇾 Uruguay dans quelques jours, 20h. Combat tactique de haut niveau. Hype 77/100.",
-    broadcasters: ["beIN Sports 1"],
+    broadcasters: [bc("beIN Sports 1")],
     verdict: "Beau choc tactique à venir cette semaine. Note-le.",
     odds: { home: 2.45, draw: 2.95, away: 3.2 },
     marketSignal: "match-serre",
@@ -577,7 +591,7 @@ export const MATCHES: Match[] = [
     atStake: "Une finale de Coupe du Monde. Difficile de faire plus gros.",
     whatsappBrief:
       "🇫🇷 France vs 🇲🇦 Maroc en DEMI-FINALE cette semaine, 21h. La revanche de 2022. Hype 94/100. À bloquer absolument.",
-    broadcasters: ["TF1", "beIN Sports 1"],
+    broadcasters: [bc("TF1"), bc("beIN Sports 1")],
     verdict: "Une demi-finale qui sent la poudre. Immanquable, bloque la date.",
     odds: { home: 1.95, draw: 3.3, away: 3.85 },
     marketSignal: "affiche-brulante",
@@ -634,7 +648,7 @@ export const MATCHES: Match[] = [
     atStake: "L'autre billet pour la finale. Du très, très beau football en perspective.",
     whatsappBrief:
       "🇧🇷 Brésil vs 🇪🇸 Espagne en demi-finale cette semaine, 21h. Foot champagne des deux côtés. Hype 90/100.",
-    broadcasters: ["TF1", "beIN Sports 1"],
+    broadcasters: [bc("TF1"), bc("beIN Sports 1")],
     verdict: "L'autre demi-finale, du grand spectacle attendu. Immanquable.",
     odds: { home: 2.4, draw: 3.35, away: 2.8 },
     marketSignal: "affiche-brulante",
@@ -660,6 +674,25 @@ export const MATCHES: Match[] = [
     watchVerdictLong: "L'autre demi-finale, du grand spectacle attendu. Deux attaques de feu, un marché incapable de les départager. Du très beau football en perspective.",
   },
 ];
+
+/**
+ * Final exported matches: each manually-curated fixture is stamped with its
+ * provenance (manual curation, editorially verified) and a one-line stakes
+ * summary derived from `atStake` for the practical-info blocks.
+ */
+export const MATCHES: Match[] = FIXTURES.map((m) => {
+  const firstSentence = m.atStake.split(". ")[0];
+  return {
+    ...m,
+    stakesSummary: firstSentence.endsWith(".") ? firstSentence : `${firstSentence}.`,
+    provenance: {
+      source: "manual",
+      lastUpdatedMinAgo: m.marketUpdatedMinAgo,
+      confidence: "high",
+      verified: true,
+    },
+  };
+});
 
 const MATCH_MAP = new Map(MATCHES.map((m) => [m.id, m]));
 

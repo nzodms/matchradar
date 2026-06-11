@@ -48,11 +48,11 @@ function HotBoardCard({ entry, rank, index }: { entry: HotBoardEntry; rank: numb
               {entry.label}
             </p>
             <div className="mt-1 flex items-center gap-1.5">
-              <Flag cc={match.home.countryCode} size={16} ring={false} />
+              <Flag cc={match.home.countryCode} size={16} variant="inline" />
               <p className="min-w-0 truncate font-display text-[15px] font-bold leading-tight text-ink">
                 {match.home.name} <span className="text-faint">·</span> {match.away.name}
               </p>
-              <Flag cc={match.away.countryCode} size={16} ring={false} />
+              <Flag cc={match.away.countryCode} size={16} variant="inline" />
             </div>
             <p className="mt-1 line-clamp-1 text-[12px] text-muted">{entry.punch}</p>
           </div>

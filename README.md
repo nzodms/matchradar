@@ -1,7 +1,7 @@
 # 📡 MatchRadar
 
-**104 matchs. On te dit lesquels regarder.**
-_Le radar des événements sportifs à ne pas rater._
+**Tu ouvres MatchRadar, tu sais quoi regarder ce soir.**
+_Tous les jours : les matchs à ne pas rater, horaires, chaînes, enjeux, hype et brief WhatsApp._
 
 MatchRadar est une web app **mobile-first, dark, premium** qui aide à savoir quels
 matchs/événements sportifs regarder aujourd'hui, demain et cette semaine — via un
@@ -110,6 +110,42 @@ match : éditer `hypeScore`, `odds`, `marketSignal`, `marketCopy`, `heatLevel`,
 `storylines`, `watchVerdictShort/Long`, etc. `dayOffset` (0 = aujourd'hui) garde la
 démo « evergreen ». Les équipes sont dans `data/teams.ts`, les événements à venir dans
 `data/events.ts`.
+
+## 🔌 Fondation données réelles (`lib/data-sources/`)
+
+L'app tourne en **mock** par défaut et bascule provider par provider dès qu'une
+clé est présente — sans toucher à l'UI :
+
+| Variable d'env          | Provider                          | Sans clé |
+| ----------------------- | --------------------------------- | -------- |
+| `SPORTS_API_KEY`        | calendrier + scores live          | mock     |
+| `BROADCASTERS_API_KEY`  | droits TV/streaming (optionnel)   | mock     |
+| `ODDS_API_KEY`          | cotes indicatives (optionnel)     | mock     |
+
+```
+lib/data-sources/
+  config.ts               ← lecture des clés, sourceFor(), isFullMock()
+  fixturesProvider.ts     ← calendrier des matchs (getFixtures)
+  liveScoreProvider.ts    ← statuts live + applyLiveStatuses()
+  broadcastersProvider.ts ← chaînes + broadcasterLabel() (règle "à confirmer")
+  oddsProvider.ts         ← cotes 1N2 indicatives
+  normalizeMatch.ts       ← normalisation payload API → Match interne
+  status.ts               ← getProviderStatus()
+```
+
+- **`GET /api/health`** → état de chaque provider (mock/api) + dernier sync.
+- Chaque match porte une **provenance** (`source`, `lastUpdatedMinAgo`,
+  `confidence`, `verified`) affichée en micro-labels de confiance ("Mis à jour
+  il y a 4 min · Données calendrier · Horaire vérifié").
+- En dev sans clé, un badge discret "Données de démonstration" s'affiche
+  (jamais en production).
+
+### Règle diffuseurs (ne jamais inventer une chaîne)
+
+`Broadcaster.verified === false` ⇒ l'UI affiche **"à confirmer"**, partout
+(cartes, détail, brief WhatsApp, export calendrier). Seules les entrées
+vérifiées (curation manuelle ou API validée) s'affichent comme certaines.
+`broadcasterLabel()` est le seul chemin autorisé pour afficher une chaîne.
 
 ## 🏗️ Architecture & branchement API
 

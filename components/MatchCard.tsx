@@ -5,14 +5,15 @@ import { displayTime } from "@/lib/datetime";
 import { getHypeTier } from "@/lib/hype";
 import { cn } from "@/lib/utils";
 import type { HydratedMatch } from "@/types";
+import { broadcasterLabel } from "@/lib/data-sources/broadcastersProvider";
 import { motion } from "framer-motion";
-import { ChevronRight, Heart } from "lucide-react";
+import { ChevronRight, Heart, Tv } from "lucide-react";
 import Link from "next/link";
 import { Flag } from "./Flag";
 import { LiveBadge } from "./LiveBadge";
 import { MatchStatusBadge } from "./MatchStatusBadge";
 import { OddsStrip } from "./OddsStrip";
-import { CopyBriefButton } from "./actions";
+import { AddCalendarButton, CopyBriefButton } from "./actions";
 
 type Variant = "auto" | "hot" | "live" | "chill" | "market" | "brief";
 
@@ -98,17 +99,21 @@ export function MatchCard({ match, index = 0, variant = "auto", compact }: Match
           <Side team={match.away} side="right" />
         </div>
 
-        {/* time */}
-        <p className="relative mt-2 text-center text-[11.5px] font-medium text-muted">
+        {/* time · channel · city — the practical line */}
+        <p className="relative mt-2 flex items-center justify-center gap-1.5 text-center text-[11.5px] font-medium text-muted">
           {isLive ? (
             <span className="text-danger">● En direct</span>
           ) : (
-            <>
+            <span className="tabular">
               {time}
               {dayShift !== 0 && <span className="text-faint"> ({dayShift > 0 ? "J+1" : "J-1"})</span>}
-            </>
+            </span>
           )}
-          <span className="text-faint"> · {match.city}</span>
+          <span className="text-faint">·</span>
+          <span className="inline-flex items-center gap-1 text-ink/90">
+            <Tv size={11} className="text-faint" /> {broadcasterLabel(match.broadcasters[0])}
+          </span>
+          <span className="hidden text-faint sm:inline">· {match.city}</span>
         </p>
 
         {/* C · reason */}
@@ -126,9 +131,10 @@ export function MatchCard({ match, index = 0, variant = "auto", compact }: Match
             {/* E · action */}
             <div className="relative mt-3 flex items-center justify-between">
               <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-muted transition-colors group-hover:text-ink">
-                Voir le détail <ChevronRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+                Détail <ChevronRight size={14} className="transition-transform group-hover:translate-x-0.5" />
               </span>
-              <div className="relative z-20">
+              <div className="relative z-20 flex items-center gap-1.5">
+                <AddCalendarButton match={match} size="sm" />
                 <CopyBriefButton match={match} size="sm" label="Brief" variant="ghost" />
               </div>
             </div>

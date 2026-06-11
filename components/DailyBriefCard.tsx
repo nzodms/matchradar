@@ -2,6 +2,7 @@
 
 import { useTimezone } from "@/components/Providers";
 import { getTeam } from "@/data/teams";
+import { broadcasterLabel } from "@/lib/data-sources/broadcastersProvider";
 import { displayTime } from "@/lib/datetime";
 import { formatOdd, marketFavorite } from "@/lib/market";
 import { cn } from "@/lib/utils";
@@ -47,12 +48,17 @@ export function DailyBriefCard({ brief, className }: { brief: DailyBrief; classN
                 )}
               >
                 <span className="w-4 text-center font-display text-sm font-bold text-faint">{i + 1}</span>
-                <Flag cc={m.home.countryCode} size={18} ring={false} />
+                <Flag cc={m.home.countryCode} size={18} variant="inline" />
                 <span className="min-w-0 flex-1 truncate text-[13.5px] font-semibold text-ink">
                   {m.home.name} <span className="text-faint">·</span> {m.away.name}
                 </span>
-                <Flag cc={m.away.countryCode} size={18} ring={false} />
-                <span className="shrink-0 text-[11px] font-medium tabular text-faint">{m.status === "live" ? "LIVE" : time}</span>
+                <Flag cc={m.away.countryCode} size={18} variant="inline" />
+                <span className="flex shrink-0 flex-col items-end leading-tight">
+                  <span className={cn("text-[11px] font-semibold tabular", m.status === "live" ? "text-danger" : "text-muted")}>
+                    {m.status === "live" ? "LIVE" : time}
+                  </span>
+                  <span className="max-w-[72px] truncate text-[9.5px] text-faint">{broadcasterLabel(m.broadcasters[0])}</span>
+                </span>
                 <span className="shrink-0 font-display text-sm font-bold tabular text-hype">{m.hypeScore}</span>
               </Link>
             );
@@ -68,11 +74,11 @@ export function DailyBriefCard({ brief, className }: { brief: DailyBrief; classN
             <span className="font-display text-lg font-bold tabular text-hype">{u.hypeScore}<span className="text-[11px] font-medium text-faint">/100</span></span>
           </div>
           <div className="mt-1.5 flex items-center gap-2">
-            <Flag cc={u.home.countryCode} size={22} ring={false} />
+            <Flag cc={u.home.countryCode} size={22} variant="inline" />
             <p className="min-w-0 flex-1 truncate font-display text-[17px] font-bold leading-tight text-ink">
               {u.home.name} <span className="text-faint">·</span> {u.away.name}
             </p>
-            <Flag cc={u.away.countryCode} size={22} ring={false} />
+            <Flag cc={u.away.countryCode} size={22} variant="inline" />
           </div>
           <div className="mt-2.5 flex items-center gap-2 border-t border-hype/12 pt-2.5 text-[11px] tabular text-muted">
             <span className="text-[9.5px] font-bold uppercase tracking-wide text-faint">Marché</span>
@@ -92,7 +98,7 @@ export function DailyBriefCard({ brief, className }: { brief: DailyBrief; classN
               <UserRound size={12} className="text-gold" /> Joueur à surveiller
             </p>
             <p className="mt-1 flex items-center gap-1.5 font-display text-sm font-bold text-ink">
-              <Flag cc={getTeam(brief.playerToWatch.teamId).countryCode} size={16} ring={false} />
+              <Flag cc={getTeam(brief.playerToWatch.teamId).countryCode} size={16} variant="inline" />
               {brief.playerToWatch.name}
             </p>
             <p className="text-[11px] text-muted">{brief.playerToWatch.role}</p>

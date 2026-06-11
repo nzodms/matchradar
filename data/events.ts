@@ -35,8 +35,8 @@ export const EVENTS: SportEvent[] = [
     comingSoon: true,
     radarType: "Matchs à ne pas rater",
     emoji: "🎾",
-    tagline: "Les matchs à ne pas rater chaque jour, alertes sur les gros chocs.",
-    bullets: ["Les affiches du jour", "Alertes pour les gros matchs", "Le verdict night session"],
+    tagline: "Chaque jour : matchs à ne pas rater, horaires français, courts, favoris, alertes gros matchs.",
+    bullets: ["Les affiches du jour et leurs courts", "Horaires français vérifiés", "Alertes pour les gros matchs"],
   },
   {
     id: "tdf",

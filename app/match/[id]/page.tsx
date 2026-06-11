@@ -15,6 +15,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { Flag } from "@/components/Flag";
 import { LiveBadge } from "@/components/LiveBadge";
 import { getTeam } from "@/data/teams";
+import { broadcasterLabel } from "@/lib/data-sources/broadcastersProvider";
 import { displayTime } from "@/lib/datetime";
 import { HYPE_FACTOR_LABELS, getHypeTier, importanceLabel } from "@/lib/hype";
 import { getCasualVerdict, getGroupChatCopy, getHardcoreVerdict, getHeatLabel } from "@/lib/market";
@@ -22,7 +23,25 @@ import { getHydratedMatch } from "@/lib/selectors";
 import { matchWhatsApp } from "@/lib/whatsapp";
 import type { HypeFactors } from "@/types";
 import { motion } from "framer-motion";
-import { Clapperboard, MapPin, MessageCircle, Radar, Sofa, Sparkles, Star, Target, Trophy, Tv, Users, type LucideIcon } from "lucide-react";
+import {
+  ChevronRight,
+  Clapperboard,
+  Clock3,
+  Database,
+  Info,
+  MapPin,
+  MessageCircle,
+  Radar,
+  ShieldCheck,
+  Sofa,
+  Sparkles,
+  Star,
+  Target,
+  Trophy,
+  Tv,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import Link from "next/link";
 
 export default function MatchDetailPage({ params }: { params: { id: string } }) {
@@ -92,12 +111,14 @@ export default function MatchDetailPage({ params }: { params: { id: string } }) 
             </div>
 
             <p className="mt-3 text-center text-xs font-medium text-muted">
-              {isLive ? <span className="text-danger">En direct</span> : time}
+              {isLive ? <span className="text-danger">En direct</span> : <span className="tabular">{time}</span>}
               {dayShift !== 0 && !isLive && <span className="text-faint"> ({dayShift > 0 ? "J+1" : "J-1"})</span>}
               <span className="text-faint"> · </span>
               <span className="inline-flex items-center gap-1"><MapPin size={11} /> {match.venue}, {match.city}</span>
-              {match.broadcasters[0] && <span className="text-faint"> · </span>}
-              {match.broadcasters[0] && <span className="inline-flex items-center gap-1 text-ink"><Tv size={11} /> {match.broadcasters.join(" / ")}</span>}
+              <span className="text-faint"> · </span>
+              <span className="inline-flex items-center gap-1 text-ink">
+                <Tv size={11} /> {match.broadcasters.map((b) => broadcasterLabel(b)).join(" / ")}
+              </span>
             </p>
 
             <div className="mt-4 grid grid-cols-3 gap-2">
@@ -116,6 +137,48 @@ export default function MatchDetailPage({ params }: { params: { id: string } }) 
         </p>
         <p className="mt-1.5 font-display text-lg font-bold leading-snug text-ink">{match.watchVerdictShort}</p>
         <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{match.watchVerdictLong}</p>
+      </div>
+
+      {/* ─── Infos pratiques ─── */}
+      <div className="card mt-4 rounded-3xl p-4">
+        <h3 className="mb-3 flex items-center gap-2 font-display text-[15px] font-bold text-ink">
+          <Info size={16} className="text-electric" /> Infos pratiques
+        </h3>
+        <dl className="grid grid-cols-2 gap-x-3 gap-y-3">
+          <PracticalRow label="Coup d'envoi" value={isLive ? `En cours (${match.liveMinute}')` : time} hint="Horaire local" />
+          <PracticalRow
+            label="Diffusion"
+            value={match.broadcasters.map((b) => broadcasterLabel(b)).join(" · ") || "Chaîne à confirmer"}
+            hint={match.broadcasters[0]?.verified ? "Chaîne confirmée" : "À confirmer"}
+            hintAccent={match.broadcasters[0]?.verified ? "hype" : "gold"}
+          />
+          <PracticalRow label="Stade" value={`${match.venue}`} hint={`${match.city}, ${match.country}`} />
+          <PracticalRow label="Compétition" value={match.competition} hint={match.round} />
+          <PracticalRow
+            label="Statut"
+            value={isLive ? "En direct" : match.status === "upcoming" ? "Programmé" : match.status === "finished" ? "Terminé" : match.status === "halftime" ? "Mi-temps" : "Reporté"}
+          />
+          <PracticalRow label="Enjeu" value={match.stakesSummary} />
+        </dl>
+        {match.officialUrl && (
+          <a href={match.officialUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-[12px] font-semibold text-electric">
+            Site officiel <ChevronRight size={13} />
+          </a>
+        )}
+        {/* trust line */}
+        <div className="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-line/7 pt-3 text-[10.5px] text-faint">
+          <span className="inline-flex items-center gap-1">
+            <Clock3 size={11} /> Mis à jour il y a {match.provenance.lastUpdatedMinAgo} min
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <Database size={11} /> {match.provenance.source === "api" ? "Données calendrier (API)" : "Données calendrier"}
+          </span>
+          {match.provenance.verified && (
+            <span className="inline-flex items-center gap-1 text-hype/80">
+              <ShieldCheck size={11} /> Horaire vérifié
+            </span>
+          )}
+        </div>
       </div>
 
       {/* ─── Stat trio ─── */}
@@ -241,6 +304,20 @@ function StatTile({ label, value, icon: Icon, sub, accent }: { label: string; va
         {Icon ? <Icon size={24} strokeWidth={2.2} /> : <span className="font-display text-2xl font-bold leading-none tabular">{value}</span>}
       </div>
       <p className="mt-1 line-clamp-1 text-[10.5px] text-muted">{sub}</p>
+    </div>
+  );
+}
+
+function PracticalRow({ label, value, hint, hintAccent }: { label: string; value: string; hint?: string; hintAccent?: string }) {
+  return (
+    <div className="min-w-0">
+      <dt className="text-[10px] font-semibold uppercase tracking-wide text-faint">{label}</dt>
+      <dd className="mt-0.5 text-[13px] font-semibold leading-snug text-ink">{value}</dd>
+      {hint && (
+        <dd className="mt-0.5 text-[10.5px]" style={{ color: hintAccent ? `rgb(var(--${hintAccent}) / 0.85)` : "rgb(var(--faint))" }}>
+          {hint}
+        </dd>
+      )}
     </div>
   );
 }

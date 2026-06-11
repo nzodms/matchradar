@@ -4,14 +4,22 @@ import { displayTime } from "./datetime";
 /**
  * Ready-to-send WhatsApp messages. The whole viral loop runs through here:
  * copy → paste in the group → friends open the app.
+ * Always includes the practical info: time AND channel.
  */
+
+/** Channel string for messages — never presents an unverified channel as certain. */
+export function channelLine(match: HydratedMatch): string {
+  const b = match.broadcasters[0];
+  if (!b) return "chaîne à confirmer";
+  return b.verified ? b.name : `${b.name} (à confirmer)`;
+}
 
 export function matchWhatsApp(match: HydratedMatch, tzId?: string): string {
   const { time } = displayTime(match.time, tzId);
   const liveOrTime = match.status === "live" ? "EN DIRECT 🔴" : time;
   return [
     `${match.home.flag} ${match.home.name} vs ${match.away.name} ${match.away.flag}`,
-    `⏰ ${liveOrTime} · ${match.round}`,
+    `⏰ ${liveOrTime} · 📺 ${channelLine(match)} · ${match.round}`,
     `🔥 Hype ${match.hypeScore}/100`,
     `👉 ${match.reasonToWatch}`,
     `— via MatchRadar 📡`,
@@ -22,11 +30,11 @@ export function dailyBriefWhatsApp(brief: DailyBrief, tzId?: string): string {
   const lines: string[] = [];
   lines.push(`📡 LE BRIEF MATCHRADAR — ${brief.dateLabel}`);
   lines.push("");
-  lines.push("🎯 À suivre aujourd'hui :");
+  lines.push("📺 Le programme :");
   brief.threeToWatch.forEach((m) => {
     const { time } = displayTime(m.time, tzId);
     const when = m.status === "live" ? "LIVE 🔴" : time;
-    lines.push(`• ${m.home.flag} ${m.home.name} – ${m.away.name} ${m.away.flag} (${when}) — ${m.hypeScore}/100`);
+    lines.push(`• ${when} ${m.home.name} – ${m.away.name} · ${channelLine(m)} — ${m.hypeScore}/100`);
   });
   lines.push("");
   lines.push(

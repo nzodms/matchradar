@@ -2,6 +2,9 @@
 
 import { AppShell } from "@/components/AppShell";
 import { DailyHotBoard } from "@/components/DailyHotBoard";
+import { DemoDataBadge } from "@/components/DemoDataBadge";
+import { RadarExplainer } from "@/components/RadarExplainer";
+import { TvSchedule } from "@/components/TvSchedule";
 import { EventSwitcher } from "@/components/EventSwitcher";
 import { HotMarketSection } from "@/components/HotMarketSection";
 import { HotMatchHero } from "@/components/HotMatchHero";
@@ -36,6 +39,7 @@ import {
   Swords,
   Trophy,
   TriangleAlert,
+  Tv,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -100,8 +104,8 @@ export default function RadarPage() {
             Ce soir, tu <span className="text-gradient-hype">regardes quoi</span> ?
           </h1>
           <p className="mt-2 max-w-sm text-sm leading-snug text-muted">
-            Le radar classe les matchs par hype, enjeu et tension du marché. On te sort les affiches chaudes,
-            tu choisis ton match.
+            MatchRadar te sort les matchs du jour, les horaires, les chaînes et le niveau de hype. Tu ouvres,
+            tu sais quoi regarder.
           </p>
 
           <div className="mt-3.5">
@@ -109,7 +113,7 @@ export default function RadarPage() {
           </div>
 
           <div className="card mt-4 flex items-center rounded-2xl">
-            <Stat value={today.length} label="aujourd'hui" />
+            <Stat value={today.length} label="matchs aujourd'hui" />
             <Divider />
             <Stat value={immanquables} label="immanquables" accent="hype" />
             <Divider />
@@ -118,8 +122,23 @@ export default function RadarPage() {
         </motion.div>
       </section>
 
+      {/* ─── Programme TV du jour — the utility block ─── */}
+      <section className="mt-5">
+        <SectionTitle
+          eyebrow="Horaires & chaînes"
+          title="À voir aujourd'hui"
+          action={
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-faint">
+              <Tv size={12} /> Programme TV
+            </span>
+          }
+        />
+        <TvSchedule matches={today} />
+        <DemoDataBadge />
+      </section>
+
       {/* ─── Event switcher ─── */}
-      <div className="mt-4">
+      <div className="mt-5">
         <EventSwitcher activeId="wc" />
       </div>
 
@@ -212,6 +231,27 @@ export default function RadarPage() {
             <EmptyState icon={Radar} title="Aucun match sur ce filtre" description="Change de filtre ou de jour, le radar a forcément quelque chose pour toi." />
           )}
         </div>
+      </section>
+
+      {/* ─── Demain sur le radar ─── */}
+      {tomorrow.length > 0 && (
+        <section className="mt-7">
+          <SectionTitle
+            eyebrow="Pour anticiper"
+            title="Demain sur le radar"
+            action={
+              <button type="button" onClick={() => setDay("tomorrow")} className="tap inline-flex items-center gap-1 text-xs font-bold text-hype">
+                Tout voir <ArrowRight size={13} />
+              </button>
+            }
+          />
+          <TvSchedule matches={tomorrow.slice(0, 3)} />
+        </section>
+      )}
+
+      {/* ─── Comment ça marche ─── */}
+      <section className="mt-7">
+        <RadarExplainer />
       </section>
 
       {/* ─── Teasers ─── */}

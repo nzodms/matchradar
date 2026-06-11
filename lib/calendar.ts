@@ -34,7 +34,9 @@ function matchDescription(match: HydratedMatch): string {
   return [
     `Hype ${match.hypeScore}/100 · Enjeu ${match.importanceScore}/100`,
     match.reasonToWatch,
-    match.broadcasters.length ? `Diffusion : ${match.broadcasters.join(", ")}` : "",
+    match.broadcasters.length
+      ? `Diffusion : ${match.broadcasters.map((b) => (b.verified ? b.name : `${b.name} (à confirmer)`)).join(", ")}`
+      : "Diffusion : chaîne à confirmer",
     "Ajouté depuis MatchRadar 📡",
   ]
     .filter(Boolean)

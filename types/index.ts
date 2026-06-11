@@ -59,7 +59,39 @@ export interface Team {
   star?: string; // headline player for the team
 }
 
-export type MatchStatus = "upcoming" | "live" | "finished";
+export type MatchStatus = "upcoming" | "live" | "halftime" | "finished" | "postponed";
+
+/* ───────────────────────── Data provenance ───────────────────────── */
+
+export type DataSource = "mock" | "manual" | "api";
+
+export type ConfidenceLevel = "high" | "medium" | "low";
+
+/** Where a record came from and how much to trust it. Rendered as small trust labels. */
+export interface DataProvenance {
+  source: DataSource;
+  /** Minutes ago (mock) — a real provider returns an ISO date instead. */
+  lastUpdatedMinAgo: number;
+  confidence: ConfidenceLevel;
+  verified: boolean;
+}
+
+export interface Broadcaster {
+  name: string;
+  country: string;
+  channelType: "tv" | "streaming" | "radio" | "unknown";
+  url?: string;
+  /** false ⇒ the UI must show "à confirmer", never present it as certain. */
+  verified: boolean;
+}
+
+export interface DataProviderStatus {
+  fixtures: DataSource;
+  liveScores: DataSource;
+  broadcasters: DataSource;
+  odds: DataSource;
+  lastSyncedAt: string | null;
+}
 
 export type BadgeKey =
   | "immanquable"
@@ -166,9 +198,15 @@ export interface Match {
   story: string;
   /** "Ce qui est en jeu" */
   atStake: string;
+  /** One-line summary of what's at stake (practical info blocks). */
+  stakesSummary: string;
   whatsappBrief: string;
-  broadcasters: string[];
+  broadcasters: Broadcaster[];
+  officialUrl?: string;
   verdict: string;
+
+  /* ── Data provenance (trust labels, dev badge, future API swap) ── */
+  provenance: DataProvenance;
 
   /* ── Market Pulse (cotes indicatives) ── */
   odds: Odds;
