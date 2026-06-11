@@ -2,138 +2,99 @@
 
 import { useTimezone } from "@/components/Providers";
 import { displayTime } from "@/lib/datetime";
-import { getHeatLabel, marketFavorite } from "@/lib/market";
-import { cn } from "@/lib/utils";
+import { getHypeTier } from "@/lib/hype";
+import { marketFavorite } from "@/lib/market";
 import type { HydratedMatch } from "@/types";
-import { ArrowRight, Clock, Flame, MapPin, Siren, Tv } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { HypeScore } from "./HypeScore";
 import { LiveBadge } from "./LiveBadge";
-import { MatchHeatMeter } from "./MatchHeatMeter";
 import { MarketSignalBadge } from "./MarketSignalBadge";
+import { MatchStatusBadge } from "./MatchStatusBadge";
 import { OddsPill } from "./OddsPill";
-import { PremiumGlowCard } from "./PremiumGlowCard";
-import { RadarBackground } from "./RadarBackground";
 import { TeamCrest } from "./TeamCrest";
 import { ActionButton, AddCalendarButton, CopyBriefButton } from "./actions";
 
-/** The showstopper. The hottest/live match, rendered like a burning poster. */
-export function HotMatchHero({ match, eyebrow = "Le match le plus chaud maintenant" }: { match: HydratedMatch; eyebrow?: string }) {
+/** The hero affiche — premium, calm, one accent. The screen-record star. */
+export function HotMatchHero({ match, eyebrow = "Le match à ne pas rater ce soir" }: { match: HydratedMatch; eyebrow?: string }) {
   const { tzId } = useTimezone();
-  const heat = getHeatLabel(match.heatLevel);
-  const accent = heat.accent;
+  const tier = getHypeTier(match.hypeScore);
+  const accent = tier.accent;
   const isLive = match.status === "live";
   const { time, dayShift } = displayTime(match.time, tzId);
   const fav = marketFavorite(match);
 
   return (
-    <PremiumGlowCard accent={accent} glow inset={false} className="card-arcade sheen p-4">
-      <RadarBackground accent={accent} className="opacity-80" />
+    <div className="card-arcade relative overflow-hidden rounded-[1.75rem] p-5">
+      {/* single soft accent wash */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-40"
+        style={{ background: `radial-gradient(80% 100% at 50% 0%, rgb(var(--${accent}) / 0.14), transparent 70%)` }}
+      />
 
       <div className="relative">
-        {/* top badges */}
-        <div className="mb-3 flex items-center justify-between gap-2">
-          <span
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-bg"
-            style={{ background: `rgb(var(--${accent}))`, boxShadow: `0 8px 24px -8px rgb(var(--${accent}))` }}
-          >
-            <Siren size={13} strokeWidth={2.8} />
-            {isLive ? "Match en direct" : "Match à ne pas rater"}
-          </span>
-          {isLive ? <LiveBadge minute={match.liveMinute} /> : (
-            <span className="inline-flex items-center gap-1 text-[12px] font-bold" style={{ color: `rgb(var(--${accent}))` }}>
-              {heat.emoji} {heat.label}
-            </span>
-          )}
+        {/* header */}
+        <div className="flex items-center justify-between gap-2">
+          <p className="eyebrow" style={{ color: `rgb(var(--${accent}))` }}>{eyebrow}</p>
+          {isLive ? <LiveBadge minute={match.liveMinute} /> : <MatchStatusBadge badge={match.tags[0]} />}
         </div>
 
-        {/* emotional tag */}
-        <p className="mb-2 text-center font-display text-[13px] font-semibold text-muted">
-          « {match.emotionalTag} »
-        </p>
+        <p className="mt-2 text-center text-[13px] font-medium italic text-muted">« {match.emotionalTag} »</p>
 
         {/* teams + hype */}
-        <div className="flex items-center justify-between gap-1">
-          <TeamCrest team={match.home} align="center" size="lg" showRank className="flex-1" />
+        <div className="mt-3 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+          <TeamCrest team={match.home} align="center" size="lg" showRank className="min-w-0" />
           <div className="flex flex-col items-center">
             {isLive && match.homeScore != null ? (
               <>
-                <span className="font-display text-5xl font-bold leading-none tabular text-ink">
-                  {match.homeScore}<span className="px-1 text-muted">-</span>{match.awayScore}
+                <span className="font-display text-4xl font-bold tabular text-ink">
+                  {match.homeScore}<span className="px-1.5 text-faint">-</span>{match.awayScore}
                 </span>
                 <HypeScore score={match.hypeScore} size="sm" className="mt-1.5" />
               </>
             ) : (
-              <HypeScore score={match.hypeScore} size="xl" />
+              <HypeScore score={match.hypeScore} size="lg" showTier />
             )}
           </div>
-          <TeamCrest team={match.away} align="center" size="lg" showRank className="flex-1" />
+          <TeamCrest team={match.away} align="center" size="lg" showRank className="min-w-0" />
         </div>
 
         {/* meta */}
-        <div className="mt-3 flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-[11px] font-medium text-muted">
-          <span className="inline-flex items-center gap-1">
-            <Clock size={11} /> {isLive ? "En direct" : time}
-            {dayShift !== 0 && <span className="text-faint">({dayShift > 0 ? "J+1" : "J-1"})</span>}
-          </span>
-          <Dot /> <span>{match.round}</span>
-          <Dot />
-          <span className="inline-flex items-center gap-1"><MapPin size={11} /> {match.city}</span>
-          {match.broadcasters[0] && (
-            <>
-              <Dot />
-              <span className="inline-flex items-center gap-1 text-ink"><Tv size={11} /> {match.broadcasters[0]}</span>
-            </>
-          )}
-        </div>
-
-        {/* heat meter */}
-        <div className="mt-3.5">
-          <MatchHeatMeter level={match.heatLevel} />
-        </div>
+        <p className="mt-3 text-center text-xs font-medium text-muted">
+          {isLive ? <span className="text-danger">En direct</span> : time}
+          {dayShift !== 0 && !isLive && <span className="text-faint"> ({dayShift > 0 ? "J+1" : "J-1"})</span>}
+          <span className="text-faint"> · {match.round} · {match.city}</span>
+          {match.broadcasters[0] && <span className="text-faint"> · {match.broadcasters[0]}</span>}
+        </p>
 
         {/* verdict */}
-        <div
-          className="mt-3 flex items-start gap-2 rounded-2xl border p-3"
-          style={{ borderColor: `rgb(var(--${accent}) / 0.3)`, background: `rgb(var(--${accent}) / 0.08)` }}
-        >
-          <Flame size={16} className="mt-0.5 shrink-0" style={{ color: `rgb(var(--${accent}))` }} />
-          <p className="font-display text-[15px] font-bold leading-tight text-ink">{match.watchVerdictShort}</p>
+        <div className="mt-4 rounded-2xl px-4 py-3 text-center" style={{ background: `rgb(var(--${accent}) / 0.08)` }}>
+          <p className="font-display text-[15px] font-bold leading-snug text-ink">{match.watchVerdictShort}</p>
         </div>
 
         {/* market pulse mini */}
-        <div className="mt-3 rounded-2xl border border-line/8 bg-bg/40 p-2.5">
+        <div className="mt-3">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wide text-faint">📊 Market Pulse</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-faint">Market Pulse</span>
             <MarketSignalBadge signal={match.marketSignal} size="sm" />
           </div>
           <div className="flex gap-2">
-            <OddsPill label={match.home.id.toUpperCase()} odd={match.odds.home} favorite={fav.side === "home"} accent={accent} />
-            <OddsPill label="Nul" odd={match.odds.draw} accent={accent} />
-            <OddsPill label={match.away.id.toUpperCase()} odd={match.odds.away} favorite={fav.side === "away"} accent={accent} />
+            <OddsPill label={match.home.id.toUpperCase()} odd={match.odds.home} favorite={fav.side === "home"} accent="gold" />
+            <OddsPill label="Nul" odd={match.odds.draw} accent="gold" />
+            <OddsPill label={match.away.id.toUpperCase()} odd={match.odds.away} favorite={fav.side === "away"} accent="gold" />
           </div>
         </div>
 
         {/* CTAs */}
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          <ActionButton
-            internalHref={`/match/${match.id}`}
-            accent={accent}
-            variant="solid"
-            full
-            size="lg"
-            className="col-span-2"
-            icon={<ArrowRight size={18} />}
-          >
+        <div className="mt-4 space-y-2">
+          <ActionButton internalHref={`/match/${match.id}`} accent={accent} variant="solid" full size="lg" icon={<ArrowRight size={18} />}>
             Voir pourquoi ça chauffe
           </ActionButton>
-          <AddCalendarButton match={match} full />
-          <CopyBriefButton match={match} full label="Copier le brief" />
+          <div className="grid grid-cols-2 gap-2">
+            <AddCalendarButton match={match} full />
+            <CopyBriefButton match={match} full label="Copier le brief" />
+          </div>
         </div>
       </div>
-    </PremiumGlowCard>
+    </div>
   );
-}
-
-function Dot() {
-  return <span className="text-faint">·</span>;
 }

@@ -16,10 +16,8 @@ export function EventSwitcher({ activeId = "wc" }: { activeId?: string }) {
               key={event.id}
               href={event.comingSoon ? "/events" : "/"}
               className={cn(
-                "tap group relative flex shrink-0 items-center gap-1.5 rounded-2xl border px-3 py-2 transition-all",
-                active
-                  ? "border-hype/40 bg-hype/12 shadow-glow-hype"
-                  : "border-line/10 bg-surface/50 hover:border-line/20",
+                "tap group relative flex shrink-0 items-center gap-1.5 rounded-2xl border px-3 py-2 transition-colors",
+                active ? "border-hype/30 bg-hype/10" : "border-line/8 bg-surface/40 hover:border-line/16",
               )}
             >
               <span className="text-base leading-none">{event.emoji}</span>
@@ -32,7 +30,7 @@ export function EventSwitcher({ activeId = "wc" }: { activeId?: string }) {
                 </span>
               </div>
               {event.comingSoon && (
-                <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-violet shadow-[0_0_8px_2px_rgb(var(--violet))]" />
+                <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-violet/70" />
               )}
             </Link>
           );

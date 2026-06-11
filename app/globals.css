@@ -4,29 +4,29 @@
 
 @layer base {
   :root {
-    /* Core surfaces — deep night + pitch */
-    --bg: 5 8 14;          /* #05080E near-black blue */
-    --bg-2: 8 12 20;       /* slightly elevated backdrop */
-    --surface: 14 19 30;   /* card base */
-    --surface-2: 20 27 41; /* raised card */
+    /* Core surfaces — deep premium night */
+    --bg: 7 10 16;         /* page background */
+    --bg-2: 11 15 23;      /* elevated backdrop */
+    --surface: 18 23 34;   /* card base */
+    --surface-2: 24 30 44; /* raised card */
     --pitch: 6 26 18;      /* football field green-black */
 
     /* Text */
-    --ink: 244 247 252;    /* primary text */
-    --muted: 142 152 170;  /* secondary text */
-    --faint: 90 100 118;   /* tertiary text */
+    --ink: 245 247 251;    /* primary text */
+    --muted: 148 158 176;  /* secondary text */
+    --faint: 101 111 130;  /* tertiary text */
     --line: 255 255 255;   /* used with low alpha for borders */
 
-    /* Neon accents */
-    --hype: 38 245 142;    /* #26F58E neon green */
-    --danger: 255 61 87;   /* #FF3D57 neon red */
-    --gold: 255 200 61;    /* #FFC83D neon yellow */
-    --electric: 56 160 255;/* #38A0FF electric blue */
-    --violet: 149 108 255; /* #956CFF */
+    /* Accents (used sparingly — one strong accent per surface) */
+    --hype: 42 233 145;    /* brand green */
+    --danger: 255 75 92;   /* live / hot red */
+    --gold: 255 197 84;    /* market yellow */
+    --electric: 64 156 255;/* electric blue */
+    --violet: 152 116 255; /* events violet */
   }
 
   * {
-    border-color: rgb(var(--line) / 0.08);
+    border-color: rgb(var(--line) / 0.07);
   }
 
   html {
@@ -41,14 +41,14 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     overscroll-behavior-y: none;
+    letter-spacing: -0.01em;
   }
 
   ::selection {
-    background: rgb(var(--hype) / 0.3);
+    background: rgb(var(--hype) / 0.28);
     color: rgb(var(--ink));
   }
 
-  /* Slim, on-brand scrollbar */
   ::-webkit-scrollbar {
     width: 7px;
     height: 7px;
@@ -57,51 +57,74 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgb(var(--line) / 0.12);
+    background: rgb(var(--line) / 0.1);
     border-radius: 999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgb(var(--line) / 0.2);
+    background: rgb(var(--line) / 0.18);
   }
 }
 
 @layer components {
-  /* Frosted glass card — the workhorse surface */
-  .glass {
-    background: linear-gradient(
-      160deg,
-      rgb(var(--surface) / 0.9),
-      rgb(var(--bg-2) / 0.7)
-    );
-    backdrop-filter: blur(14px) saturate(140%);
-    -webkit-backdrop-filter: blur(14px) saturate(140%);
+  /* ───────── Surfaces ───────── */
+
+  /* The single premium card recipe used across the whole app. Soft elevation,
+     hairline border, gentle top highlight — no glow, no colored borders. */
+  .card {
+    position: relative;
+    background: linear-gradient(180deg, rgb(var(--surface) / 0.8), rgb(var(--bg-2) / 0.72));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgb(var(--line) / 0.07);
+    box-shadow:
+      inset 0 1px 0 0 rgb(255 255 255 / 0.04),
+      0 1px 2px 0 rgb(0 0 0 / 0.35),
+      0 22px 48px -30px rgb(0 0 0 / 0.8);
+  }
+
+  /* Re-skinned: legacy class now maps to the clean premium card. */
+  .card-arcade {
+    position: relative;
+    background: linear-gradient(180deg, rgb(var(--surface) / 0.85), rgb(var(--bg-2) / 0.75));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgb(var(--line) / 0.08);
+    box-shadow:
+      inset 0 1px 0 0 rgb(255 255 255 / 0.05),
+      0 1px 2px 0 rgb(0 0 0 / 0.4),
+      0 28px 60px -34px rgb(0 0 0 / 0.85);
   }
 
+  /* Frosted overlays — nav, header, toasts. */
+  .glass {
+    background: rgb(var(--bg-2) / 0.68);
+    backdrop-filter: blur(18px) saturate(120%);
+    -webkit-backdrop-filter: blur(18px) saturate(120%);
+    border: 1px solid rgb(var(--line) / 0.07);
+  }
   .glass-strong {
-    background: linear-gradient(
-      160deg,
-      rgb(var(--surface-2) / 0.95),
-      rgb(var(--surface) / 0.85)
-    );
-    backdrop-filter: blur(20px) saturate(160%);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
-    border: 1px solid rgb(var(--line) / 0.1);
+    background: rgb(var(--bg-2) / 0.86);
+    backdrop-filter: blur(24px) saturate(130%);
+    -webkit-backdrop-filter: blur(24px) saturate(130%);
+    border: 1px solid rgb(var(--line) / 0.09);
   }
 
-  /* Thin luminous top border accent */
-  .edge-light::before {
+  /* Subtle top sheen (replaces the old diagonal band). */
+  .sheen::after {
     content: "";
     position: absolute;
-    inset: 0 0 auto 0;
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgb(var(--line) / 0.5),
-      transparent
-    );
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.05), transparent 26%);
   }
+
+  /* Very soft single top wash, used behind the hero only. */
+  .spotlights {
+    background-image: radial-gradient(70% 44% at 50% -8%, rgb(var(--hype) / 0.1), transparent 72%);
+  }
+
+  /* ───────── Text ───────── */
 
   .text-gradient {
     background: linear-gradient(180deg, rgb(var(--ink)), rgb(var(--muted)));
@@ -109,67 +132,31 @@
     background-clip: text;
     color: transparent;
   }
-
   .text-gradient-hype {
-    background: linear-gradient(110deg, rgb(var(--hype)), rgb(var(--electric)));
+    background: linear-gradient(100deg, rgb(var(--hype)), rgb(110 245 190));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
 
-  /* Number/label treatment for scores */
   .tabular {
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum";
   }
 
-  /* Section eyebrow label */
   .eyebrow {
-    @apply text-[11px] font-semibold uppercase tracking-[0.22em] text-faint;
+    @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-faint;
   }
 
-  /* Large touch target reset */
   .tap {
     @apply transition-transform duration-150 active:scale-[0.97];
   }
 }
 
-@layer components {
-  /* Stadium spotlight wash — big coloured halos behind sections */
-  .spotlights {
-    background-image:
-      radial-gradient(40% 32% at 12% 4%, rgb(var(--hype) / 0.16), transparent 70%),
-      radial-gradient(42% 34% at 88% 0%, rgb(var(--electric) / 0.16), transparent 70%),
-      radial-gradient(48% 38% at 50% 120%, rgb(var(--violet) / 0.14), transparent 70%);
-  }
-
-  /* Arcade / collectible card — thicker edge, deeper shadow, inner sheen */
-  .card-arcade {
-    position: relative;
-    border: 1.5px solid rgb(var(--line) / 0.12);
-    background: linear-gradient(165deg, rgb(var(--surface-2) / 0.94), rgb(var(--bg-2) / 0.86));
-    box-shadow:
-      inset 0 1px 0 0 rgb(255 255 255 / 0.06),
-      0 26px 52px -26px rgb(0 0 0 / 0.9);
-    backdrop-filter: blur(12px) saturate(150%);
-    -webkit-backdrop-filter: blur(12px) saturate(150%);
-  }
-
-  /* Diagonal collectible sheen */
-  .sheen::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: linear-gradient(115deg, transparent 38%, rgb(255 255 255 / 0.06) 48%, transparent 58%);
-    pointer-events: none;
-  }
-}
-
 @layer utilities {
-  /* Fine film grain — gives the dark surfaces texture instead of flat black */
+  /* Fine film grain — texture instead of flat black. */
   .bg-noise {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
   .safe-bottom {
@@ -186,19 +173,7 @@
     scrollbar-width: none;
   }
   .mask-fade-x {
-    -webkit-mask-image: linear-gradient(
-      90deg,
-      transparent,
-      #000 6%,
-      #000 94%,
-      transparent
-    );
-    mask-image: linear-gradient(
-      90deg,
-      transparent,
-      #000 6%,
-      #000 94%,
-      transparent
-    );
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
   }
 }

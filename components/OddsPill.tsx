@@ -12,35 +12,21 @@ interface OddsPillProps {
   className?: string;
 }
 
-/**
- * Big, instantly-readable 1-N-2 odds block (informational only — no bet action).
- * The market favorite gets the accent glow.
- */
+/** Clean 1-N-2 odds block (informational only). Favorite gets a subtle accent. */
 export function OddsPill({ label, odd, favorite, accent = "gold", className }: OddsPillProps) {
   return (
     <div
-      className={cn(
-        "relative flex-1 rounded-xl border px-2 py-2 text-center transition-colors",
-        favorite ? "" : "border-line/10 bg-bg/50",
-        className,
-      )}
+      className={cn("flex-1 rounded-2xl border px-2 py-2.5 text-center transition-colors", className)}
       style={
         favorite
-          ? {
-              borderColor: `rgb(var(--${accent}) / 0.5)`,
-              background: `rgb(var(--${accent}) / 0.12)`,
-              boxShadow: `0 0 18px -6px rgb(var(--${accent}) / 0.55)`,
-            }
-          : undefined
+          ? { borderColor: `rgb(var(--${accent}) / 0.32)`, background: `rgb(var(--${accent}) / 0.08)` }
+          : { borderColor: "rgb(var(--line) / 0.08)", background: "rgb(var(--bg) / 0.4)" }
       }
     >
-      <p
-        className="text-[9.5px] font-bold uppercase tracking-wide"
-        style={{ color: favorite ? `rgb(var(--${accent}))` : "rgb(var(--faint))" }}
-      >
+      <p className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: favorite ? `rgb(var(--${accent}))` : "rgb(var(--faint))" }}>
         {label}
       </p>
-      <p className="font-display text-lg font-bold leading-none tabular text-ink">{formatOdd(odd)}</p>
+      <p className="mt-0.5 font-display text-[17px] font-bold leading-none tabular text-ink">{formatOdd(odd)}</p>
     </div>
   );
 }

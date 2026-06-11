@@ -14,7 +14,7 @@ export function Skeleton({ className }: { className?: string }) {
 /** Match-card shaped skeleton used while data loads. */
 export function MatchCardSkeleton() {
   return (
-    <div className="glass rounded-3xl p-3.5">
+    <div className="card rounded-3xl p-3.5">
       <div className="mb-3 flex justify-between">
         <Skeleton className="h-5 w-20" />
         <Skeleton className="h-5 w-5 rounded-full" />
@@ -38,7 +38,7 @@ export function MatchCardSkeleton() {
 
 export function FeaturedSkeleton() {
   return (
-    <div className="glass rounded-3xl p-5">
+    <div className="card rounded-3xl p-5">
       <Skeleton className="mb-4 h-4 w-40" />
       <div className="flex items-center justify-between">
         <Skeleton className="h-16 w-16 rounded-full" />

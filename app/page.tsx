@@ -91,10 +91,12 @@ export default function RadarPage() {
             <SportTicker />
           </div>
 
-          <div className="mt-3 grid grid-cols-3 gap-2">
-            <StatTile value={today.length} label="matchs aujourd'hui" accent="electric" />
-            <StatTile value={immanquables} label="immanquables" accent="hype" />
-            <StatTile value={live.length} label="en direct" accent="danger" pulse={live.length > 0} />
+          <div className="card mt-4 flex items-center rounded-2xl">
+            <Stat value={today.length} label="aujourd'hui" />
+            <Divider />
+            <Stat value={immanquables} label="immanquables" accent="hype" />
+            <Divider />
+            <Stat value={live.length} label="en direct" accent="danger" live={live.length > 0} />
           </div>
         </motion.div>
       </section>
@@ -202,21 +204,23 @@ export default function RadarPage() {
   );
 }
 
-function StatTile({ value, label, accent, pulse }: { value: number; label: string; accent: "hype" | "electric" | "danger"; pulse?: boolean }) {
+function Divider() {
+  return <span className="h-9 w-px bg-line/8" />;
+}
+
+function Stat({ value, label, accent, live }: { value: number; label: string; accent?: "hype" | "danger"; live?: boolean }) {
   return (
-    <div className="card-arcade rounded-2xl px-2.5 py-2.5">
-      <div className="flex items-center gap-1.5">
-        {pulse && (
+    <div className="flex flex-1 flex-col items-center justify-center py-3">
+      <span className="flex items-center gap-1.5 font-display text-[22px] font-bold leading-none tabular" style={{ color: accent ? `rgb(var(--${accent}))` : "rgb(var(--ink))" }}>
+        {live && (
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-danger opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-danger" />
           </span>
         )}
-        <span className="font-display text-2xl font-bold leading-none tabular" style={{ color: `rgb(var(--${accent}))` }}>
-          {value}
-        </span>
-      </div>
-      <p className="mt-1 text-[10px] font-medium leading-tight text-faint">{label}</p>
+        {value}
+      </span>
+      <span className="mt-1 text-[10.5px] font-medium text-faint">{label}</span>
     </div>
   );
 }
@@ -224,7 +228,7 @@ function StatTile({ value, label, accent, pulse }: { value: number; label: strin
 function TeaserCard({ href, icon: Icon, title, subtitle, accent }: { href: string; icon: typeof Newspaper; title: string; subtitle: string; accent: "hype" | "violet" }) {
   return (
     <Link href={href} className="tap group block">
-      <div className="glass relative flex items-center gap-3 overflow-hidden rounded-3xl p-4">
+      <div className="card relative flex items-center gap-3 overflow-hidden rounded-3xl p-4">
         <span className="pointer-events-none absolute inset-x-0 top-0 h-px" style={{ background: `linear-gradient(90deg, transparent, rgb(var(--${accent}) / 0.6), transparent)` }} />
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ring-1 ring-line/10" style={{ background: `rgb(var(--${accent}) / 0.12)`, color: `rgb(var(--${accent}))` }}>
           <Icon size={20} />

@@ -37,8 +37,8 @@ export default function EventsPage() {
 
       {/* Active radar */}
       <Link href="/" className="tap group mt-5 block">
-        <div className="card-arcade sheen relative overflow-hidden rounded-3xl p-4 shadow-glow-hype">
-          <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-hype/70 to-transparent" />
+        <div className="card-arcade relative overflow-hidden rounded-3xl p-4 ring-1 ring-hype/15">
+          <span className="pointer-events-none absolute inset-x-0 top-0 h-20" style={{ background: "radial-gradient(70% 100% at 50% 0%, rgb(var(--hype) / 0.1), transparent 70%)" }} />
           <div className="flex items-center gap-3">
             <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-hype/12 text-3xl ring-1 ring-hype/25">{ACTIVE_EVENT.emoji}</span>
             <div className="min-w-0 flex-1">
@@ -105,8 +105,8 @@ function NextRadarVote() {
 
   return (
     <section className="mt-7">
-      <div className="card-arcade sheen relative overflow-hidden rounded-3xl p-4">
-        <span className="pointer-events-none absolute -left-10 -top-10 h-32 w-32 rounded-full bg-violet/18 blur-3xl" />
+      <div className="card-arcade relative overflow-hidden rounded-3xl p-4">
+        <span className="pointer-events-none absolute inset-x-0 top-0 h-20" style={{ background: "radial-gradient(70% 100% at 30% 0%, rgb(var(--violet) / 0.12), transparent 70%)" }} />
         <div className="relative mb-3 flex items-center gap-2">
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet/15 text-violet ring-1 ring-violet/30">
             <Vote size={18} />

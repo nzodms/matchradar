@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import type { SportEvent } from "@/types";
 import { motion } from "framer-motion";
-import { BellRing, Check, CalendarRange } from "lucide-react";
+import { BellRing, CalendarRange, Check } from "lucide-react";
 import { useState } from "react";
 import { Pill } from "./MatchStatusBadge";
 import { useToast } from "./Toast";
@@ -15,25 +15,16 @@ export function SportEventCard({ event, index = 0 }: { event: SportEvent; index?
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.45, delay: Math.min(index * 0.06, 0.4), ease: [0.16, 1, 0.3, 1] }}
-      className="glass relative overflow-hidden rounded-3xl p-4"
+      className="card rounded-3xl p-4"
     >
-      <span
-        className="pointer-events-none absolute inset-x-0 top-0 h-px"
-        style={{ background: `linear-gradient(90deg, transparent, rgb(var(--${accent}) / 0.6), transparent)` }}
-      />
-      <span
-        className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full blur-2xl"
-        style={{ background: `rgb(var(--${accent}) / 0.14)` }}
-      />
-
-      <div className="relative flex items-start gap-3">
+      <div className="flex items-start gap-3.5">
         <span
           className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-3xl ring-1"
-          style={{ background: `rgb(var(--${accent}) / 0.12)`, boxShadow: `inset 0 0 0 1px rgb(var(--${accent}) / 0.25)` }}
+          style={{ background: `rgb(var(--${accent}) / 0.1)`, boxShadow: `inset 0 0 0 1px rgb(var(--${accent}) / 0.18)` }}
         >
           {event.emoji}
         </span>
@@ -43,24 +34,19 @@ export function SportEventCard({ event, index = 0 }: { event: SportEvent; index?
             <h3 className="font-display text-base font-bold text-ink">{event.name}</h3>
             <Pill accent={accent} label="Bientôt" size="sm" />
           </div>
-          <p className="mt-0.5 flex items-center gap-1 text-[11px] font-medium text-muted">
+          <p className="mt-0.5 flex items-center gap-1 text-[11px] font-medium text-faint">
             <CalendarRange size={12} /> {event.startDate}
           </p>
           <p className="mt-1.5 text-[12.5px] leading-snug text-muted">{event.tagline}</p>
-
-          <div className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-line/10 bg-surface/50 px-2 py-1">
-            <span className="h-1.5 w-1.5 rounded-full" style={{ background: `rgb(var(--${accent}))` }} />
-            <span className="text-[11px] font-bold text-ink">{event.radarType}</span>
-          </div>
         </div>
       </div>
 
       {/* what the radar will detect */}
-      <div className="relative mt-3 rounded-2xl border border-line/8 bg-bg/30 p-2.5">
-        <p className="mb-1.5 text-[9.5px] font-bold uppercase tracking-wide text-faint">Ce que le radar va détecter</p>
-        <ul className="grid grid-cols-1 gap-1">
+      <div className="mt-3 rounded-2xl border border-line/7 bg-bg/30 p-3">
+        <p className="mb-1.5 text-[9.5px] font-semibold uppercase tracking-wide text-faint">Ce que le radar va détecter</p>
+        <ul className="space-y-1">
           {event.bullets.map((b) => (
-            <li key={b} className="flex items-center gap-1.5 text-[11.5px] text-muted">
+            <li key={b} className="flex items-center gap-2 text-[12px] text-muted">
               <span className="h-1 w-1 shrink-0 rounded-full" style={{ background: `rgb(var(--${accent}))` }} />
               {b}
             </li>
@@ -75,14 +61,14 @@ export function SportEventCard({ event, index = 0 }: { event: SportEvent; index?
           toast(`Radar ${event.name} activé 🔔`);
         }}
         className={cn(
-          "tap mt-3 inline-flex h-10 w-full items-center justify-center gap-2 rounded-2xl text-sm font-bold transition-colors",
-          armed ? "bg-surface-2/60 text-muted" : "text-bg",
+          "tap mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl text-sm font-bold transition-colors",
+          armed ? "bg-surface-2/60 text-muted ring-1 ring-line/8" : "text-bg",
         )}
-        style={armed ? undefined : { backgroundColor: `rgb(var(--${accent}))`, boxShadow: `0 10px 30px -12px rgb(var(--${accent}))` }}
+        style={armed ? undefined : { backgroundColor: `rgb(var(--${accent}))`, boxShadow: `0 10px 26px -16px rgb(var(--${accent}) / 0.6)` }}
       >
         {armed ? (
           <>
-            <Check size={16} strokeWidth={2.8} /> Tu seras prévenu
+            <Check size={16} strokeWidth={2.6} /> Tu seras prévenu
           </>
         ) : (
           <>

@@ -83,7 +83,7 @@ export default function FavoritesPage() {
                 const badge = next ? teamBadge(next) : null;
                 const lvl = levels[t.id] ?? "all";
                 return (
-                  <div key={t.id} className="glass rounded-2xl p-3">
+                  <div key={t.id} className="card rounded-2xl p-3">
                     <div className="flex items-center gap-2.5">
                       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl ring-1 ring-line/10" style={{ background: `radial-gradient(circle at 30% 30%, ${t.color}33, rgb(var(--surface)))` }}>
                         {t.flag}

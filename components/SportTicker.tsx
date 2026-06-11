@@ -45,15 +45,13 @@ export function SportTicker() {
   const loop = [...items, ...items];
 
   return (
-    <div className="relative overflow-hidden rounded-full border border-line/8 bg-bg/50 py-2 mask-fade-x">
-      <div className="flex w-max animate-marquee items-center gap-6 pr-6 hover:[animation-play-state:paused]">
+    <div className="relative overflow-hidden rounded-2xl border border-line/7 bg-surface/30 py-2 mask-fade-x">
+      <div className="flex w-max animate-marquee items-center gap-5 pr-5 hover:[animation-play-state:paused]">
         {loop.map((it, i) => (
-          <span key={i} className="flex shrink-0 items-center gap-1.5 text-[12px] font-semibold">
+          <span key={i} className="flex shrink-0 items-center gap-1.5 text-[12px] font-medium text-muted">
             <span>{it.emoji}</span>
-            <span className="text-muted" style={{ color: `rgb(var(--${it.accent}))` }}>
-              {it.text}
-            </span>
-            <span className="ml-3 h-1 w-1 rounded-full bg-line/20" />
+            <span>{it.text}</span>
+            <span className="ml-2 h-1 w-1 rounded-full bg-line/15" />
           </span>
         ))}
       </div>

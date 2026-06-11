@@ -13,8 +13,8 @@ export function LiveBadge({ minute, className, size = "md" }: LiveBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border border-danger/45 bg-danger/15 font-bold uppercase tracking-wider text-danger shadow-glow-danger",
-        size === "sm" ? "h-5 px-1.5 text-[9px]" : "h-6 px-2 text-[10px]",
+        "inline-flex items-center gap-1.5 rounded-full border border-danger/26 bg-danger/10 font-semibold uppercase tracking-wide text-danger",
+        size === "sm" ? "h-[22px] px-2 text-[10px]" : "h-7 px-2.5 text-[11px]",
         className,
       )}
     >

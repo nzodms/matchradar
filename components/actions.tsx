@@ -55,12 +55,16 @@ export function ActionButton({
 
   const style =
     variant === "solid"
-      ? { backgroundColor: `rgb(var(--${accent}))`, color: "rgb(var(--bg))", boxShadow: `0 10px 30px -10px rgb(var(--${accent}) / 0.7)` }
+      ? { backgroundColor: `rgb(var(--${accent}))`, color: "rgb(var(--bg))", boxShadow: `0 10px 26px -14px rgb(var(--${accent}) / 0.6)` }
       : variant === "outline"
-        ? { color: `rgb(var(--${accent}))`, borderColor: `rgb(var(--${accent}) / 0.4)`, backgroundColor: `rgb(var(--${accent}) / 0.08)` }
+        ? { color: `rgb(var(--${accent}))`, borderColor: `rgb(var(--${accent}) / 0.35)`, backgroundColor: `rgb(var(--${accent}) / 0.08)` }
         : undefined;
 
-  const cls = cn(base, variant === "outline" && "border", variant === "ghost" && "glass text-ink hover:bg-surface-2/60");
+  const cls = cn(
+    base,
+    variant === "outline" && "border",
+    variant === "ghost" && "bg-surface-2/50 text-ink ring-1 ring-line/8 hover:bg-surface-2/80",
+  );
 
   const content = (
     <>

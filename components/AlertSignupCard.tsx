@@ -26,11 +26,14 @@ export function AlertSignupCard({
   const valid = /.+@.+\..+/.test(email);
 
   return (
-    <div className={cn("glass-strong relative overflow-hidden rounded-3xl p-5", className)}>
-      <span className="pointer-events-none absolute -left-10 -top-10 h-36 w-36 rounded-full bg-hype/15 blur-3xl" />
+    <div className={cn("card relative overflow-hidden rounded-3xl p-5", className)}>
+      <span
+        className="pointer-events-none absolute inset-x-0 top-0 h-24"
+        style={{ background: "radial-gradient(70% 100% at 20% 0%, rgb(var(--hype) / 0.1), transparent 70%)" }}
+      />
 
       <div className="relative">
-        <span className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-hype/15 text-hype ring-1 ring-hype/30">
+        <span className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-hype/12 text-hype ring-1 ring-hype/20">
           <Mail size={18} />
         </span>
         <h3 className="font-display text-lg font-bold text-ink">{title}</h3>
@@ -63,7 +66,7 @@ export function AlertSignupCard({
             />
             <button
               type="submit"
-              className="tap inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-hype px-5 font-bold text-bg shadow-glow-hype"
+              className="tap inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-hype px-5 font-bold text-bg shadow-[0_10px_26px_-14px_rgb(var(--hype)/0.6)]"
             >
               {cta} <ArrowRight size={18} />
             </button>

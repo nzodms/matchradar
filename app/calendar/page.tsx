@@ -195,7 +195,7 @@ export default function CalendarPage() {
           {INCLUSIONS.map((inc) => {
             const active = inclusions.includes(inc.key);
             return (
-              <button key={inc.key} type="button" onClick={() => toggleInc(inc.key)} className={cn("tap rounded-full border px-3 py-2 text-[12.5px] font-bold transition-all", active ? "border-gold/45 bg-gold/12 text-gold shadow-hot-gold" : "border-line/10 bg-surface/40 text-muted")}>
+              <button key={inc.key} type="button" onClick={() => toggleInc(inc.key)} className={cn("tap rounded-full border px-3.5 py-2 text-[12.5px] font-semibold transition-colors", active ? "border-gold/30 bg-gold/10 text-gold" : "border-line/8 bg-surface/40 text-muted hover:text-ink")}>
                 {inc.label}
               </button>
             );
@@ -215,9 +215,12 @@ export default function CalendarPage() {
       {/* Result */}
       {generated && (
         <section id="radar-result" className="mt-7 scroll-mt-20">
-          <div className="card-arcade sheen relative overflow-hidden rounded-3xl border-hype/25 p-5 text-center" style={{ boxShadow: "0 0 0 1px rgb(var(--hype) / 0.25), 0 24px 50px -28px rgb(var(--hype) / 0.5)" }}>
-            <span className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-hype/20 blur-3xl" />
-            <Sparkles size={22} className="mx-auto mb-1.5 text-hype" />
+          <div className="card-arcade relative overflow-hidden rounded-3xl p-5 text-center ring-1 ring-hype/15">
+            <span
+              className="pointer-events-none absolute inset-x-0 top-0 h-24"
+              style={{ background: "radial-gradient(70% 100% at 50% 0%, rgb(var(--hype) / 0.12), transparent 70%)" }}
+            />
+            <Sparkles size={22} className="relative mx-auto mb-1.5 text-hype" />
             <p className="font-display text-xl font-bold text-ink">Ton radar est prêt.</p>
             <p className="mt-0.5 text-sm text-muted">
               Tu as <span className="font-bold text-hype tabular">{stats.total}</span> match{stats.total > 1 ? "s" : ""} chaud{stats.total > 1 ? "s" : ""} sur ton radar.

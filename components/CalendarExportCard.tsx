@@ -12,11 +12,9 @@ export function CalendarExportCard({ matches, className }: { matches: HydratedMa
   const count = matches.length;
 
   return (
-    <div className={cn("glass relative overflow-hidden rounded-3xl p-4", className)}>
-      <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-electric/60 to-transparent" />
-
+    <div className={cn("card relative overflow-hidden rounded-3xl p-4", className)}>
       <div className="mb-3 flex items-center gap-2.5">
-        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-electric/15 text-electric ring-1 ring-electric/30">
+        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-electric/12 text-electric ring-1 ring-electric/20">
           <CalendarCheck size={18} />
         </span>
         <div>
@@ -35,7 +33,7 @@ export function CalendarExportCard({ matches, className }: { matches: HydratedMa
             downloadICS(matches, "matchradar-google.ics");
             toast("Calendrier exporté 📅");
           }}
-          className="tap inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-electric font-bold text-bg shadow-glow-electric disabled:opacity-40"
+          className="tap inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-electric font-bold text-bg shadow-[0_10px_26px_-14px_rgb(var(--electric)/0.6)] disabled:opacity-40"
         >
           <CalendarPlus size={16} /> Google
         </button>
@@ -46,7 +44,7 @@ export function CalendarExportCard({ matches, className }: { matches: HydratedMa
             downloadICS(matches, "matchradar-apple.ics");
             toast("Fichier .ics téléchargé 🍎");
           }}
-          className="tap inline-flex h-11 items-center justify-center gap-2 rounded-2xl glass font-bold text-ink hover:bg-surface-2/60 disabled:opacity-40"
+          className="tap inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-surface-2/50 font-bold text-ink ring-1 ring-line/8 hover:bg-surface-2/80 disabled:opacity-40"
         >
           <Apple size={16} /> Apple
         </button>

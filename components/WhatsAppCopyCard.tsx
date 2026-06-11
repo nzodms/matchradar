@@ -24,11 +24,9 @@ export function WhatsAppCopyCard({
   const { toast } = useToast();
 
   return (
-    <div className={cn("glass relative overflow-hidden rounded-3xl p-4", className)}>
-      <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-hype/60 to-transparent" />
-
+    <div className={cn("card relative overflow-hidden rounded-3xl p-4", className)}>
       <div className="mb-3 flex items-center gap-2.5">
-        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-hype/15 text-hype ring-1 ring-hype/30">
+        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-hype/12 text-hype ring-1 ring-hype/20">
           <MessageCircle size={18} />
         </span>
         <div>
@@ -38,7 +36,7 @@ export function WhatsAppCopyCard({
       </div>
 
       {/* chat bubble preview */}
-      <div className="rounded-2xl rounded-tl-md border border-hype/15 bg-[#0c160f] p-3 shadow-inner">
+      <div className="rounded-2xl rounded-tl-md border border-hype/12 bg-[#0c1510] p-3.5">
         <pre className="whitespace-pre-wrap break-words font-sans text-[13px] leading-relaxed text-ink/90">
           {text}
         </pre>
@@ -54,7 +52,7 @@ export function WhatsAppCopyCard({
           }}
           className={cn(
             "tap inline-flex h-11 items-center justify-center gap-2 rounded-2xl font-bold transition-colors",
-            copied ? "bg-hype/20 text-hype" : "bg-hype text-bg shadow-glow-hype",
+            copied ? "bg-hype/15 text-hype ring-1 ring-hype/25" : "bg-hype text-bg shadow-[0_10px_26px_-14px_rgb(var(--hype)/0.6)]",
           )}
         >
           {copied ? <Check size={18} strokeWidth={2.8} /> : <Copy size={18} />}
@@ -65,7 +63,7 @@ export function WhatsAppCopyCard({
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Partager sur WhatsApp"
-          className="tap inline-flex h-11 w-11 items-center justify-center rounded-2xl glass text-hype hover:bg-surface-2/60"
+          className="tap inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-surface-2/50 text-hype ring-1 ring-line/8 hover:bg-surface-2/80"
         >
           <MessageCircle size={18} />
         </a>

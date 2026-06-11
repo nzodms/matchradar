@@ -39,14 +39,17 @@ const config: Config = {
         "5xl": "2.5rem",
       },
       boxShadow: {
-        "glow-hype": "0 0 0 1px rgb(var(--hype) / 0.35), 0 0 28px -4px rgb(var(--hype) / 0.45)",
-        "glow-danger": "0 0 0 1px rgb(var(--danger) / 0.35), 0 0 28px -4px rgb(var(--danger) / 0.45)",
-        "glow-gold": "0 0 0 1px rgb(var(--gold) / 0.35), 0 0 28px -4px rgb(var(--gold) / 0.45)",
-        "glow-electric": "0 0 0 1px rgb(var(--electric) / 0.35), 0 0 28px -4px rgb(var(--electric) / 0.45)",
-        card: "0 1px 0 0 rgb(255 255 255 / 0.04) inset, 0 24px 48px -24px rgb(0 0 0 / 0.8)",
-        "card-hover": "0 1px 0 0 rgb(255 255 255 / 0.08) inset, 0 30px 60px -20px rgb(0 0 0 / 0.9)",
-        hot: "0 0 0 1px rgb(var(--danger) / 0.4), 0 0 44px -6px rgb(var(--danger) / 0.6)",
-        "hot-gold": "0 0 0 1px rgb(var(--gold) / 0.4), 0 0 40px -6px rgb(var(--gold) / 0.55)",
+        // Soft, premium elevation (the default for cards).
+        soft: "0 1px 2px 0 rgb(0 0 0 / 0.35), 0 18px 40px -28px rgb(0 0 0 / 0.75)",
+        elevated:
+          "inset 0 1px 0 0 rgb(255 255 255 / 0.05), 0 1px 2px 0 rgb(0 0 0 / 0.4), 0 30px 60px -32px rgb(0 0 0 / 0.85)",
+        // Subtle accent glows — used rarely, on a single element.
+        "glow-hype": "0 0 0 1px rgb(var(--hype) / 0.22), 0 14px 32px -18px rgb(var(--hype) / 0.4)",
+        "glow-danger": "0 0 0 1px rgb(var(--danger) / 0.22), 0 14px 32px -18px rgb(var(--danger) / 0.4)",
+        "glow-gold": "0 0 0 1px rgb(var(--gold) / 0.22), 0 14px 32px -18px rgb(var(--gold) / 0.4)",
+        "glow-electric": "0 0 0 1px rgb(var(--electric) / 0.22), 0 14px 32px -18px rgb(var(--electric) / 0.4)",
+        card: "0 1px 2px 0 rgb(0 0 0 / 0.35), 0 18px 40px -28px rgb(0 0 0 / 0.75)",
+        "card-hover": "0 1px 2px 0 rgb(0 0 0 / 0.4), 0 24px 48px -28px rgb(0 0 0 / 0.85)",
       },
       backgroundImage: {
         "radial-fade": "radial-gradient(ellipse at top, rgb(var(--electric) / 0.18), transparent 60%)",

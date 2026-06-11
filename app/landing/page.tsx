@@ -58,8 +58,8 @@ export default function LandingPage() {
   return (
     <div className="relative min-h-[100dvh] overflow-hidden">
       <div className="pointer-events-none fixed inset-0 -z-10 bg-bg">
-        <div className="absolute inset-x-0 top-0 h-[520px] bg-radial-fade opacity-70" />
-        <div className="absolute inset-0 bg-grid-faint bg-[size:48px_48px] opacity-30" />
+        <div className="absolute inset-x-0 top-0 h-[520px]" style={{ background: "radial-gradient(120% 70% at 50% -10%, rgb(var(--hype) / 0.1), transparent 60%)" }} />
+        <div className="bg-noise absolute inset-0 opacity-[0.035]" />
       </div>
 
       <div className="mx-auto max-w-lg px-4 pb-28">
@@ -100,7 +100,7 @@ export default function LandingPage() {
               </Link>
               <Link
                 href="/calendar"
-                className="tap inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl glass font-display font-bold text-ink"
+                className="tap inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-surface-2/50 font-display font-bold text-ink ring-1 ring-line/8"
               >
                 Créer mon calendrier
               </Link>
@@ -131,7 +131,7 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.45, delay: i * 0.05 }}
-              className="glass relative flex items-start gap-3 overflow-hidden rounded-3xl p-4"
+              className="card relative flex items-start gap-3 overflow-hidden rounded-3xl p-4"
             >
               <span
                 className="pointer-events-none absolute inset-x-0 top-0 h-px"
@@ -153,8 +153,8 @@ export default function LandingPage() {
 
         {/* roadmap teaser */}
         <section className="mt-6">
-          <div className="glass-strong relative overflow-hidden rounded-3xl p-5">
-            <span className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-violet/15 blur-3xl" />
+          <div className="card-arcade relative overflow-hidden rounded-3xl p-5">
+            <span className="pointer-events-none absolute inset-x-0 top-0 h-24" style={{ background: "radial-gradient(70% 100% at 80% 0%, rgb(var(--violet) / 0.14), transparent 70%)" }} />
             <Rocket size={22} className="text-violet" />
             <h3 className="mt-3 font-display text-xl font-bold leading-tight text-ink">
               Coupe du Monde maintenant. Wimbledon ensuite. Puis tous les gros événements.
