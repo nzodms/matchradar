@@ -1,5 +1,6 @@
 "use client";
 
+import { getEventIcon } from "@/lib/eventIcons";
 import { cn } from "@/lib/utils";
 import type { SportEvent } from "@/types";
 import { motion } from "framer-motion";
@@ -12,6 +13,7 @@ export function SportEventCard({ event, index = 0 }: { event: SportEvent; index?
   const { toast } = useToast();
   const [armed, setArmed] = useState(false);
   const accent = event.themeColor;
+  const Icon = getEventIcon(event.id);
 
   return (
     <motion.div
@@ -23,10 +25,10 @@ export function SportEventCard({ event, index = 0 }: { event: SportEvent; index?
     >
       <div className="flex items-start gap-3.5">
         <span
-          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-3xl ring-1"
-          style={{ background: `rgb(var(--${accent}) / 0.1)`, boxShadow: `inset 0 0 0 1px rgb(var(--${accent}) / 0.18)` }}
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ring-1"
+          style={{ background: `rgb(var(--${accent}) / 0.1)`, color: `rgb(var(--${accent}))`, boxShadow: `inset 0 0 0 1px rgb(var(--${accent}) / 0.18)` }}
         >
-          {event.emoji}
+          <Icon size={26} strokeWidth={2} />
         </span>
 
         <div className="min-w-0 flex-1">
@@ -58,7 +60,7 @@ export function SportEventCard({ event, index = 0 }: { event: SportEvent; index?
         type="button"
         onClick={() => {
           setArmed(true);
-          toast(`Radar ${event.name} activé 🔔`);
+          toast(`Radar ${event.name} activé`);
         }}
         className={cn(
           "tap mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl text-sm font-bold transition-colors",

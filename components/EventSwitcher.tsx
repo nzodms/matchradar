@@ -1,6 +1,7 @@
 "use client";
 
 import { EVENTS } from "@/data/events";
+import { getEventIcon } from "@/lib/eventIcons";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -11,16 +12,17 @@ export function EventSwitcher({ activeId = "wc" }: { activeId?: string }) {
       <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 py-0.5">
         {EVENTS.map((event) => {
           const active = event.id === activeId && !event.comingSoon;
+          const Icon = getEventIcon(event.id);
           return (
             <Link
               key={event.id}
               href={event.comingSoon ? "/events" : "/"}
               className={cn(
-                "tap group relative flex shrink-0 items-center gap-1.5 rounded-2xl border px-3 py-2 transition-colors",
+                "tap group relative flex shrink-0 items-center gap-2 rounded-2xl border px-3 py-2 transition-colors",
                 active ? "border-hype/30 bg-hype/10" : "border-line/8 bg-surface/40 hover:border-line/16",
               )}
             >
-              <span className="text-base leading-none">{event.emoji}</span>
+              <Icon size={16} strokeWidth={2.2} className={active ? "text-hype" : "text-muted"} />
               <div className="flex flex-col leading-none">
                 <span className={cn("text-xs font-bold", active ? "text-hype" : "text-ink")}>
                   {event.name}

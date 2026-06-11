@@ -4,6 +4,7 @@ import { useFavorites } from "@/components/Providers";
 import { TEAMS } from "@/data/teams";
 import { cn } from "@/lib/utils";
 import { Check, Search } from "lucide-react";
+import { Flag } from "./Flag";
 import { useMemo, useState } from "react";
 
 interface TeamPickerProps {
@@ -50,12 +51,7 @@ export function TeamPicker({ limit, className }: TeamPickerProps) {
                   : "border-line/10 bg-surface/40 hover:border-line/20",
               )}
             >
-              <span
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xl ring-1 ring-line/10"
-                style={{ background: `radial-gradient(circle at 30% 30%, ${team.color}33, rgb(var(--surface)))` }}
-              >
-                {team.flag}
-              </span>
+              <Flag cc={team.countryCode} size={36} />
               <span className="min-w-0 flex-1">
                 <span className="block truncate font-display text-sm font-bold text-ink">{team.name}</span>
                 <span className="text-[10px] font-medium uppercase tracking-wide text-faint">

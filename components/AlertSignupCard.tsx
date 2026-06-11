@@ -53,7 +53,7 @@ export function AlertSignupCard({
                 return;
               }
               setDone(true);
-              toast("Brief quotidien activé 🔔");
+              toast("Brief quotidien activé");
             }}
           >
             <input

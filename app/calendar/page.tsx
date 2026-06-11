@@ -14,7 +14,25 @@ import { allMatches, byHype } from "@/lib/selectors";
 import { cn } from "@/lib/utils";
 import type { FanLevel, HydratedMatch, TimeSlot } from "@/types";
 import { motion } from "framer-motion";
-import { Check, Globe2, Hammer, Moon, Sparkles, Sun, Sunrise, Sunset, Users, Zap } from "lucide-react";
+import {
+  BarChart3,
+  Check,
+  Flag,
+  Flame,
+  Globe2,
+  Hammer,
+  Moon,
+  Radio,
+  Sparkles,
+  Star,
+  Sun,
+  Sunrise,
+  Sunset,
+  TriangleAlert,
+  Users,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 
 const FAN_LEVELS: { key: FanLevel; label: string; hint: string; icon: typeof Zap }[] = [
@@ -32,11 +50,11 @@ const SLOTS: { key: TimeSlot; label: string; icon: typeof Sun; range: string }[]
 ];
 
 type Inclusion = "market" | "immanquables" | "pays" | "brulantes";
-const INCLUSIONS: { key: Inclusion; label: string }[] = [
-  { key: "brulantes", label: "🔥 Affiches brûlantes" },
-  { key: "market", label: "📊 Fort Market Pulse" },
-  { key: "pays", label: "🏳️ Matchs de mon pays" },
-  { key: "immanquables", label: "🚨 Seulement immanquables" },
+const INCLUSIONS: { key: Inclusion; label: string; icon: LucideIcon }[] = [
+  { key: "brulantes", label: "Affiches brûlantes", icon: Flame },
+  { key: "market", label: "Fort Market Pulse", icon: BarChart3 },
+  { key: "pays", label: "Matchs de mon pays", icon: Flag },
+  { key: "immanquables", label: "Seulement immanquables", icon: Star },
 ];
 
 function bucket(time: string): TimeSlot {
@@ -137,7 +155,7 @@ export default function CalendarPage() {
             <Globe2 size={16} className="text-faint" />
             <select value={country} onChange={(e) => setCountry(e.target.value)} className="w-full bg-transparent text-sm font-semibold text-ink outline-none">
               {countries.map((t) => (
-                <option key={t.id} value={t.id} className="bg-surface text-ink">{t.flag} {t.name}</option>
+                <option key={t.id} value={t.id} className="bg-surface text-ink">{t.name}</option>
               ))}
             </select>
           </SelectShell>
@@ -194,8 +212,10 @@ export default function CalendarPage() {
         <div className="flex flex-wrap gap-2">
           {INCLUSIONS.map((inc) => {
             const active = inclusions.includes(inc.key);
+            const Icon = inc.icon;
             return (
-              <button key={inc.key} type="button" onClick={() => toggleInc(inc.key)} className={cn("tap rounded-full border px-3.5 py-2 text-[12.5px] font-semibold transition-colors", active ? "border-gold/30 bg-gold/10 text-gold" : "border-line/8 bg-surface/40 text-muted hover:text-ink")}>
+              <button key={inc.key} type="button" onClick={() => toggleInc(inc.key)} className={cn("tap inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-[12.5px] font-semibold transition-colors", active ? "border-gold/30 bg-gold/10 text-gold" : "border-line/8 bg-surface/40 text-muted hover:text-ink")}>
+                <Icon size={13} strokeWidth={2.4} />
                 {inc.label}
               </button>
             );
@@ -226,10 +246,10 @@ export default function CalendarPage() {
               Tu as <span className="font-bold text-hype tabular">{stats.total}</span> match{stats.total > 1 ? "s" : ""} chaud{stats.total > 1 ? "s" : ""} sur ton radar.
             </p>
             <div className="mt-3 flex flex-wrap justify-center gap-1.5">
-              <ResultPill emoji="🚨" value={stats.immanquables} label="immanquables" accent="danger" />
-              <ResultPill emoji="🪤" value={stats.pieges} label="pièges" accent="gold" />
-              {stats.live > 0 && <ResultPill emoji="🔴" value={stats.live} label="en live" accent="danger" />}
-              <ResultPill emoji="🔥" value={stats.hot} label="chauds" accent="hype" />
+              <ResultPill icon={Star} value={stats.immanquables} label="immanquables" accent="danger" />
+              <ResultPill icon={TriangleAlert} value={stats.pieges} label="pièges" accent="gold" />
+              {stats.live > 0 && <ResultPill icon={Radio} value={stats.live} label="en live" accent="danger" />}
+              <ResultPill icon={Flame} value={stats.hot} label="chauds" accent="hype" />
             </div>
           </div>
 
@@ -269,10 +289,10 @@ export default function CalendarPage() {
   );
 }
 
-function ResultPill({ emoji, value, label, accent }: { emoji: string; value: number; label: string; accent: string }) {
+function ResultPill({ icon: Icon, value, label, accent }: { icon: LucideIcon; value: number; label: string; accent: string }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-bold" style={{ color: `rgb(var(--${accent}))`, borderColor: `rgb(var(--${accent}) / 0.35)`, background: `rgb(var(--${accent}) / 0.1)` }}>
-      {emoji} <span className="tabular">{value}</span> <span className="text-muted">{label}</span>
+    <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold" style={{ color: `rgb(var(--${accent}))`, borderColor: `rgb(var(--${accent}) / 0.3)`, background: `rgb(var(--${accent}) / 0.1)` }}>
+      <Icon size={12} strokeWidth={2.4} /> <span className="tabular">{value}</span> <span className="text-muted">{label}</span>
     </span>
   );
 }

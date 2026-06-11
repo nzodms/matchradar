@@ -1,12 +1,14 @@
 "use client";
 
 import { useTimezone } from "@/components/Providers";
+import { getTeam } from "@/data/teams";
 import { displayTime } from "@/lib/datetime";
 import { formatOdd, marketFavorite } from "@/lib/market";
 import { cn } from "@/lib/utils";
 import type { DailyBrief } from "@/types";
 import { Lightbulb, Siren, Sparkles, UserRound } from "lucide-react";
 import Link from "next/link";
+import { Flag } from "./Flag";
 import { Logo } from "./Logo";
 import { MarketSignalBadge } from "./MarketSignalBadge";
 import { RadarBackground } from "./RadarBackground";
@@ -45,11 +47,11 @@ export function DailyBriefCard({ brief, className }: { brief: DailyBrief; classN
                 )}
               >
                 <span className="w-4 text-center font-display text-sm font-bold text-faint">{i + 1}</span>
-                <span className="text-base">{m.home.flag}</span>
+                <Flag cc={m.home.countryCode} size={18} ring={false} />
                 <span className="min-w-0 flex-1 truncate text-[13.5px] font-semibold text-ink">
                   {m.home.name} <span className="text-faint">·</span> {m.away.name}
                 </span>
-                <span className="text-base">{m.away.flag}</span>
+                <Flag cc={m.away.countryCode} size={18} ring={false} />
                 <span className="shrink-0 text-[11px] font-medium tabular text-faint">{m.status === "live" ? "LIVE" : time}</span>
                 <span className="shrink-0 font-display text-sm font-bold tabular text-hype">{m.hypeScore}</span>
               </Link>
@@ -65,9 +67,13 @@ export function DailyBriefCard({ brief, className }: { brief: DailyBrief; classN
             </p>
             <span className="font-display text-lg font-bold tabular text-hype">{u.hypeScore}<span className="text-[11px] font-medium text-faint">/100</span></span>
           </div>
-          <p className="mt-1 font-display text-[17px] font-bold leading-tight text-ink">
-            {u.home.flag} {u.home.name} <span className="text-faint">·</span> {u.away.name} {u.away.flag}
-          </p>
+          <div className="mt-1.5 flex items-center gap-2">
+            <Flag cc={u.home.countryCode} size={22} ring={false} />
+            <p className="min-w-0 flex-1 truncate font-display text-[17px] font-bold leading-tight text-ink">
+              {u.home.name} <span className="text-faint">·</span> {u.away.name}
+            </p>
+            <Flag cc={u.away.countryCode} size={22} ring={false} />
+          </div>
           <div className="mt-2.5 flex items-center gap-2 border-t border-hype/12 pt-2.5 text-[11px] tabular text-muted">
             <span className="text-[9.5px] font-bold uppercase tracking-wide text-faint">Marché</span>
             <span className={fav.side === "home" ? "text-ink" : ""}><span className="text-faint">{u.home.id.toUpperCase()}</span> {formatOdd(u.odds.home)}</span>
@@ -85,7 +91,10 @@ export function DailyBriefCard({ brief, className }: { brief: DailyBrief; classN
             <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-faint">
               <UserRound size={12} className="text-gold" /> Joueur à surveiller
             </p>
-            <p className="mt-1 font-display text-sm font-bold text-ink">{brief.playerToWatch.flag} {brief.playerToWatch.name}</p>
+            <p className="mt-1 flex items-center gap-1.5 font-display text-sm font-bold text-ink">
+              <Flag cc={getTeam(brief.playerToWatch.teamId).countryCode} size={16} ring={false} />
+              {brief.playerToWatch.name}
+            </p>
             <p className="text-[11px] text-muted">{brief.playerToWatch.role}</p>
           </div>
           <div>

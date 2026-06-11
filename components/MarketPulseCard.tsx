@@ -4,6 +4,7 @@ import { getMarketRisk, getMarketSignal, marketBalance, marketFavorite, marketUp
 import { cn } from "@/lib/utils";
 import type { HydratedMatch } from "@/types";
 import { Activity, Clock3 } from "lucide-react";
+import { Flag } from "./Flag";
 import { MarketSignalBadge } from "./MarketSignalBadge";
 import { OddsPill } from "./OddsPill";
 import { ResponsibleGamingNote } from "./ResponsibleGamingNote";
@@ -45,7 +46,7 @@ export function MarketPulseCard({ match, className }: { match: HydratedMatch; cl
           <p className="text-[10px] font-semibold uppercase tracking-wide text-faint">Favori du marché</p>
           {favTeam ? (
             <p className="mt-1 flex items-center gap-1.5 font-display text-sm font-bold text-ink">
-              <span className="text-base">{favTeam.flag}</span>
+              <Flag cc={favTeam.countryCode} size={18} ring={false} />
               <span className="truncate">{favTeam.name}</span>
               <span className="text-[11px] font-semibold tabular text-gold">{fav.prob}%</span>
             </p>

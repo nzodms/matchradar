@@ -19,7 +19,7 @@ const ITEMS: NavItem[] = [
   { href: "/brief", label: "Brief", icon: Newspaper, match: (p) => p.startsWith("/brief") },
   { href: "/calendar", label: "Calendrier", icon: CalendarDays, match: (p) => p.startsWith("/calendar") },
   { href: "/favorites", label: "Favoris", icon: Star, match: (p) => p.startsWith("/favorites") },
-  { href: "/events", label: "Prochainement", icon: Rocket, match: (p) => p.startsWith("/events") },
+  { href: "/events", label: "Events", icon: Rocket, match: (p) => p.startsWith("/events") },
 ];
 
 export function BottomNavigation() {
@@ -27,8 +27,8 @@ export function BottomNavigation() {
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-50 safe-bottom">
-      <div className="mx-auto max-w-lg px-3 pb-3">
-        <div className="glass-strong flex items-center justify-around rounded-2xl px-1.5 py-1.5 shadow-card">
+      <div className="mx-auto max-w-lg px-4 pb-3">
+        <div className="glass-strong flex items-center gap-1 rounded-[1.6rem] p-1.5 shadow-elevated">
           {ITEMS.map((item) => {
             const active = item.match(pathname);
             const Icon = item.icon;
@@ -36,23 +36,23 @@ export function BottomNavigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="tap relative flex flex-1 flex-col items-center gap-0.5 rounded-xl px-1 py-1.5"
+                className="tap relative flex flex-1 flex-col items-center gap-1 rounded-2xl py-2"
               >
                 {active && (
                   <motion.span
                     layoutId="nav-active"
-                    className="absolute inset-0 rounded-xl bg-hype/12 ring-1 ring-hype/30"
-                    transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                    className="absolute inset-0 rounded-2xl bg-hype/12"
+                    transition={{ type: "spring", stiffness: 480, damping: 38 }}
                   />
                 )}
                 <Icon
-                  size={20}
+                  size={21}
                   strokeWidth={active ? 2.6 : 2}
-                  className={cn("relative transition-colors", active ? "text-hype" : "text-muted")}
+                  className={cn("relative transition-colors", active ? "text-hype" : "text-faint")}
                 />
                 <span
                   className={cn(
-                    "relative text-[9.5px] font-bold tracking-tight transition-colors",
+                    "relative text-[9.5px] font-semibold tracking-tight transition-colors",
                     active ? "text-hype" : "text-faint",
                   )}
                 >

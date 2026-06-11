@@ -3,8 +3,7 @@
 import { getHypeTier } from "@/lib/hype";
 import { cn } from "@/lib/utils";
 import { animate, motion, useInView, useMotionValue, useTransform } from "framer-motion";
-import { Flame } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 
 interface HypeScoreProps {
   score: number;
@@ -14,28 +13,28 @@ interface HypeScoreProps {
 }
 
 const DIMS = {
-  xs: { box: 40, stroke: 4, font: "text-sm" },
-  sm: { box: 56, stroke: 5, font: "text-lg" },
-  md: { box: 84, stroke: 6, font: "text-2xl" },
-  lg: { box: 116, stroke: 8, font: "text-4xl" },
-  xl: { box: 152, stroke: 10, font: "text-6xl" },
+  xs: { box: 40, stroke: 3.5, font: "text-sm", label: false },
+  sm: { box: 58, stroke: 4.5, font: "text-xl", label: false },
+  md: { box: 86, stroke: 5.5, font: "text-2xl", label: false },
+  lg: { box: 112, stroke: 6.5, font: "text-[40px]", label: true },
+  xl: { box: 150, stroke: 8, font: "text-6xl", label: true },
 } as const;
 
-/** Animated circular hype ring with count-up and tier color/glow. */
+/** Crisp circular hype ring — clean track, rounded accent arc, count-up. */
 export function HypeScore({ score, size = "md", showTier = false, className }: HypeScoreProps) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
   const tier = getHypeTier(score);
   const color = `rgb(var(--${tier.accent}))`;
+  const gid = useId().replace(/:/g, "");
 
-  const { box, stroke, font } = DIMS[size];
+  const { box, stroke, font, label } = DIMS[size];
   const r = (box - stroke) / 2;
   const circumference = 2 * Math.PI * r;
 
   const progress = useMotionValue(0);
   const dashOffset = useTransform(progress, (p) => circumference * (1 - p));
   const count = useTransform(progress, (p) => Math.round(p * score));
-
   const countRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -53,44 +52,36 @@ export function HypeScore({ score, size = "md", showTier = false, className }: H
   return (
     <div ref={ref} className={cn("relative inline-flex flex-col items-center", className)}>
       <div className="relative" style={{ width: box, height: box }}>
-        <svg width={box} height={box} className="-rotate-90">
-          <circle
-            cx={box / 2}
-            cy={box / 2}
-            r={r}
-            fill="none"
-            stroke="rgb(var(--line) / 0.1)"
-            strokeWidth={stroke}
-          />
+        <svg width={box} height={box} viewBox={`0 0 ${box} ${box}`} className="-rotate-90">
+          <defs>
+            <linearGradient id={`g${gid}`} x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor={color} stopOpacity="0.65" />
+              <stop offset="100%" stopColor={color} stopOpacity="1" />
+            </linearGradient>
+          </defs>
+          <circle cx={box / 2} cy={box / 2} r={r} fill="none" stroke="rgb(var(--line) / 0.08)" strokeWidth={stroke} />
           <motion.circle
             cx={box / 2}
             cy={box / 2}
             r={r}
             fill="none"
-            stroke={color}
+            stroke={`url(#g${gid})`}
             strokeWidth={stroke}
             strokeLinecap="round"
             strokeDasharray={circumference}
-            style={{ strokeDashoffset: dashOffset, filter: `drop-shadow(0 0 6px ${color})` }}
+            style={{ strokeDashoffset: dashOffset }}
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className={cn("font-display font-bold leading-none tabular", font)} style={{ color }}>
             <span ref={countRef}>{inView ? score : 0}</span>
           </span>
-          {(size === "lg" || size === "xl") && (
-            <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-widest text-faint">
-              / 100 hype
-            </span>
-          )}
+          {label && <span className="mt-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-faint">Hype</span>}
         </div>
       </div>
       {showTier && (
-        <span
-          className="mt-2 inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wide"
-          style={{ color }}
-        >
-          <Flame size={12} strokeWidth={2.6} />
+        <span className="mt-2.5 inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color }}>
+          <span className="h-1.5 w-1.5 rounded-full" style={{ background: color }} />
           {tier.label}
         </span>
       )}
@@ -103,11 +94,8 @@ export function HypeChip({ score, className }: { score: number; className?: stri
   const tier = getHypeTier(score);
   return (
     <span
-      className={cn(
-        "inline-flex items-baseline gap-0.5 rounded-lg px-1.5 py-0.5 font-display text-sm font-bold tabular",
-        className,
-      )}
-      style={{ color: `rgb(var(--${tier.accent}))`, backgroundColor: `rgb(var(--${tier.accent}) / 0.12)` }}
+      className={cn("inline-flex items-baseline gap-0.5 rounded-lg px-1.5 py-0.5 font-display text-sm font-bold tabular", className)}
+      style={{ color: `rgb(var(--${tier.accent}))`, backgroundColor: `rgb(var(--${tier.accent}) / 0.1)` }}
     >
       {score}
       <span className="text-[9px] font-semibold opacity-60">/100</span>

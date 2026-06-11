@@ -2,6 +2,7 @@ import { Providers } from "@/components/Providers";
 import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import "flag-icons/css/flag-icons.min.css";
 
 const sans = Inter({
   subsets: ["latin"],

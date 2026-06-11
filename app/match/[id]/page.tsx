@@ -12,7 +12,9 @@ import { TeamCrest } from "@/components/TeamCrest";
 import { WhatsAppCopyCard } from "@/components/WhatsAppCopyCard";
 import { AddCalendarButton, GoogleCalendarButton, RemindButton, ShareButton } from "@/components/actions";
 import { EmptyState } from "@/components/EmptyState";
+import { Flag } from "@/components/Flag";
 import { LiveBadge } from "@/components/LiveBadge";
+import { getTeam } from "@/data/teams";
 import { displayTime } from "@/lib/datetime";
 import { HYPE_FACTOR_LABELS, getHypeTier, importanceLabel } from "@/lib/hype";
 import { getCasualVerdict, getGroupChatCopy, getHardcoreVerdict, getHeatLabel } from "@/lib/market";
@@ -20,7 +22,7 @@ import { getHydratedMatch } from "@/lib/selectors";
 import { matchWhatsApp } from "@/lib/whatsapp";
 import type { HypeFactors } from "@/types";
 import { motion } from "framer-motion";
-import { Clapperboard, MapPin, Radar, Sofa, Sparkles, Star, Target, Trophy, Tv, Users } from "lucide-react";
+import { Clapperboard, MapPin, MessageCircle, Radar, Sofa, Sparkles, Star, Target, Trophy, Tv, Users, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 
 export default function MatchDetailPage({ params }: { params: { id: string } }) {
@@ -120,7 +122,7 @@ export default function MatchDetailPage({ params }: { params: { id: string } }) 
       <div className="mt-3 grid grid-cols-3 gap-2.5">
         <StatTile label="Hype" value={`${match.hypeScore}`} sub={tier.short} accent={accent} />
         <StatTile label="Enjeu" value={`${match.importanceScore}`} sub={importanceLabel(match.importanceScore)} accent="electric" />
-        <StatTile label="Chaleur" value={heat.emoji} sub={heat.label} accent={heat.accent} />
+        <StatTile label="Chaleur" icon={heat.icon} sub={heat.label} accent={heat.accent} />
       </div>
 
       {/* ─── Market Pulse ─── */}
@@ -183,7 +185,7 @@ export default function MatchDetailPage({ params }: { params: { id: string } }) 
         <div className="space-y-2">
           {match.keyPlayers.map((p) => (
             <div key={p.name} className="flex items-center gap-3 rounded-2xl bg-bg/30 p-2.5 ring-1 ring-line/6">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-2/60 text-xl ring-1 ring-line/10">{p.flag}</span>
+              <Flag cc={getTeam(p.teamId).countryCode} size={40} />
               <div className="min-w-0 flex-1">
                 <p className="font-display text-sm font-bold text-ink">{p.name}</p>
                 <p className="text-[11px] font-medium text-faint">{p.role}</p>
@@ -210,7 +212,7 @@ export default function MatchDetailPage({ params }: { params: { id: string } }) 
           <VerdictRow icon={Users} accent="violet" label="Vrai passionné" text={getHardcoreVerdict(match)} />
         </div>
         <div className="mt-2 flex items-center gap-2 rounded-2xl bg-gold/[0.07] px-3 py-2.5 ring-1 ring-gold/12">
-          <span className="text-base">📱</span>
+          <MessageCircle size={16} className="shrink-0 text-gold" />
           <p className="text-[12.5px] font-semibold text-ink">{getGroupChatCopy(match)}</p>
         </div>
       </div>
@@ -231,11 +233,13 @@ export default function MatchDetailPage({ params }: { params: { id: string } }) 
   );
 }
 
-function StatTile({ label, value, sub, accent }: { label: string; value: string; sub: string; accent: string }) {
+function StatTile({ label, value, icon: Icon, sub, accent }: { label: string; value?: string; icon?: LucideIcon; sub: string; accent: string }) {
   return (
     <div className="card rounded-2xl p-3 text-center">
       <p className="text-[10px] font-semibold uppercase tracking-wide text-faint">{label}</p>
-      <p className="mt-1 font-display text-2xl font-bold leading-none tabular" style={{ color: `rgb(var(--${accent}))` }}>{value}</p>
+      <div className="mt-1.5 flex h-7 items-center justify-center" style={{ color: `rgb(var(--${accent}))` }}>
+        {Icon ? <Icon size={24} strokeWidth={2.2} /> : <span className="font-display text-2xl font-bold leading-none tabular">{value}</span>}
+      </div>
       <p className="mt-1 line-clamp-1 text-[10.5px] text-muted">{sub}</p>
     </div>
   );

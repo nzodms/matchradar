@@ -5,6 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { SportEventCard } from "@/components/SportEventCard";
 import { useToast } from "@/components/Toast";
 import { ACTIVE_EVENT, COMING_SOON_EVENTS, getEvent } from "@/data/events";
+import { getEventIcon } from "@/lib/eventIcons";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ArrowRight, Check, Radar, Sparkles, Vote } from "lucide-react";
@@ -12,10 +13,10 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 const VOTE_OPTIONS = [
-  { id: "wimbledon", label: "Wimbledon", emoji: "🎾", base: 1240 },
-  { id: "f1", label: "Formule 1", emoji: "🏎️", base: 1980 },
-  { id: "ufc", label: "UFC", emoji: "🥊", base: 1610 },
-  { id: "tdf", label: "Tour de France", emoji: "🚴", base: 870 },
+  { id: "wimbledon", label: "Wimbledon", base: 1240 },
+  { id: "f1", label: "Formule 1", base: 1980 },
+  { id: "ufc", label: "UFC", base: 1610 },
+  { id: "tdf", label: "Tour de France", base: 870 },
 ];
 
 export default function EventsPage() {
@@ -40,7 +41,12 @@ export default function EventsPage() {
         <div className="card-arcade relative overflow-hidden rounded-3xl p-4 ring-1 ring-hype/15">
           <span className="pointer-events-none absolute inset-x-0 top-0 h-20" style={{ background: "radial-gradient(70% 100% at 50% 0%, rgb(var(--hype) / 0.1), transparent 70%)" }} />
           <div className="flex items-center gap-3">
-            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-hype/12 text-3xl ring-1 ring-hype/25">{ACTIVE_EVENT.emoji}</span>
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-hype/12 text-hype ring-1 ring-hype/25">
+              {(() => {
+                const Icon = getEventIcon(ACTIVE_EVENT.id);
+                return <Icon size={26} strokeWidth={2} />;
+              })()}
+            </span>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <h3 className="font-display text-base font-bold text-ink">{ACTIVE_EVENT.name}</h3>
@@ -128,7 +134,7 @@ function NextRadarVote() {
                 disabled={!!voted}
                 onClick={() => {
                   setVoted(o.id);
-                  toast(`Vote pour ${o.label} enregistré 🗳️`);
+                  toast(`Vote pour ${o.label} enregistré`);
                 }}
                 className={cn(
                   "relative w-full overflow-hidden rounded-xl border px-3 py-2.5 text-left transition-all",
@@ -142,8 +148,11 @@ function NextRadarVote() {
                     style={{ width: `${pct}%`, background: `rgb(var(--violet) / ${isMine ? 0.22 : 0.12})` }}
                   />
                 )}
-                <span className="relative flex items-center gap-2">
-                  <span className="text-lg">{o.emoji}</span>
+                <span className="relative flex items-center gap-2.5">
+                  {(() => {
+                    const Icon = getEventIcon(o.id);
+                    return <Icon size={17} strokeWidth={2.2} className="text-muted" />;
+                  })()}
                   <span className="flex-1 font-display text-sm font-bold text-ink">{o.label}</span>
                   {isMine && <Check size={14} className="text-violet" strokeWidth={3} />}
                   {voted && <span className="font-display text-sm font-bold tabular text-violet">{pct}%</span>}

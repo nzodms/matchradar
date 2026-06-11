@@ -2,6 +2,7 @@
 
 import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
+import { Flag } from "@/components/Flag";
 import { HotMatchCard, MatchCard } from "@/components/MatchCard";
 import { useFavorites } from "@/components/Providers";
 import { SectionTitle } from "@/components/SectionTitle";
@@ -85,9 +86,7 @@ export default function FavoritesPage() {
                 return (
                   <div key={t.id} className="card rounded-2xl p-3">
                     <div className="flex items-center gap-2.5">
-                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl ring-1 ring-line/10" style={{ background: `radial-gradient(circle at 30% 30%, ${t.color}33, rgb(var(--surface)))` }}>
-                        {t.flag}
-                      </span>
+                      <Flag cc={t.countryCode} size={40} />
                       <div className="min-w-0 flex-1">
                         <p className="font-display text-sm font-bold text-ink">{t.name}</p>
                         {next && badge && (

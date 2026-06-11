@@ -122,7 +122,7 @@ export function CopyBriefButton({
       icon={copied ? <Check size={16} strokeWidth={2.8} /> : <Copy size={16} />}
       onClick={async () => {
         const ok = await copy(matchWhatsApp(match, tzId));
-        toast(ok ? "Brief copié 📋" : "Copie impossible", ok ? "success" : "info");
+        toast(ok ? "Brief copié" : "Copie impossible", ok ? "success" : "info");
       }}
     >
       {copied ? "Copié !" : label}
@@ -151,7 +151,7 @@ export function AddCalendarButton({
       icon={<CalendarPlus size={16} />}
       onClick={() => {
         downloadICS([match], `${match.id}.ics`);
-        toast("Ajouté à ton calendrier 📅");
+        toast("Ajouté à ton calendrier");
       }}
     >
       Calendrier
@@ -175,7 +175,7 @@ export function RemindButton({ match, full, variant = "ghost" }: { match: Hydrat
       accent="gold"
       full={full}
       icon={<BellRing size={16} />}
-      onClick={() => toast("On te prévient 30 min avant ⏰")}
+      onClick={() => toast("On te prévient 30 min avant")}
     >
       Me prévenir
     </ActionButton>
@@ -203,7 +203,7 @@ export function ShareButton({ match, full, variant = "ghost" }: { match: Hydrate
           }
         }
         window.open(whatsAppShareUrl(text), "_blank");
-        toast("Partage prêt 📲");
+        toast("Partage prêt");
       }}
     >
       Partager

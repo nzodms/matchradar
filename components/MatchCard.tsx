@@ -8,6 +8,7 @@ import type { HydratedMatch } from "@/types";
 import { motion } from "framer-motion";
 import { ChevronRight, Heart } from "lucide-react";
 import Link from "next/link";
+import { Flag } from "./Flag";
 import { LiveBadge } from "./LiveBadge";
 import { MatchStatusBadge } from "./MatchStatusBadge";
 import { OddsStrip } from "./OddsStrip";
@@ -141,12 +142,7 @@ export function MatchCard({ match, index = 0, variant = "auto", compact }: Match
 function Side({ team, side }: { team: HydratedMatch["home"]; side: "left" | "right" }) {
   return (
     <div className={cn("flex min-w-0 items-center gap-2.5", side === "right" && "flex-row-reverse")}>
-      <span
-        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-2xl ring-1 ring-line/10"
-        style={{ background: `radial-gradient(circle at 30% 30%, ${team.color}22, rgb(var(--surface-2)))` }}
-      >
-        {team.flag}
-      </span>
+      <Flag cc={team.countryCode} size={40} />
       <p className={cn("min-w-0 truncate font-display text-[15px] font-bold leading-tight text-ink", side === "right" && "text-right")}>
         {team.name}
       </p>

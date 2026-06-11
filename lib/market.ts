@@ -7,6 +7,20 @@ import type {
   Odds,
   WatchReasonType,
 } from "@/types";
+import {
+  Brain,
+  Flame,
+  Gem,
+  Scale,
+  Snowflake,
+  Sofa,
+  Sparkles,
+  Swords,
+  Target,
+  TriangleAlert,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
 
 /**
  * Market Pulse logic.
@@ -23,18 +37,18 @@ export const RESPONSIBLE_NOTE =
 
 interface MarketSignalMeta {
   label: string;
-  emoji: string;
+  icon: LucideIcon;
   accent: AccentToken;
   hint: string;
 }
 
 export const MARKET_SIGNALS: Record<MarketSignal, MarketSignalMeta> = {
-  "affiche-brulante": { label: "Affiche brûlante", emoji: "🔥", accent: "danger", hint: "Le match que tout le monde va commenter." },
-  "favori-clair": { label: "Favori clair", emoji: "🎯", accent: "electric", hint: "Un favori se détache nettement." },
-  "match-serre": { label: "Match serré", emoji: "⚖️", accent: "gold", hint: "Le marché ne sait pas les départager." },
-  "outsider-dangereux": { label: "Outsider dangereux", emoji: "⚠️", accent: "violet", hint: "L'outsider a les armes pour surprendre." },
-  "piege-possible": { label: "Piège possible", emoji: "🪤", accent: "gold", hint: "Le favori peut se faire surprendre." },
-  "ouverture-chaude": { label: "Ouverture chaude", emoji: "🎉", accent: "hype", hint: "Marché ouvert, ambiance garantie." },
+  "affiche-brulante": { label: "Affiche brûlante", icon: Flame, accent: "danger", hint: "Le match que tout le monde va commenter." },
+  "favori-clair": { label: "Favori clair", icon: Target, accent: "electric", hint: "Un favori se détache nettement." },
+  "match-serre": { label: "Match serré", icon: Scale, accent: "gold", hint: "Le marché ne sait pas les départager." },
+  "outsider-dangereux": { label: "Outsider dangereux", icon: Swords, accent: "violet", hint: "L'outsider a les armes pour surprendre." },
+  "piege-possible": { label: "Piège possible", icon: TriangleAlert, accent: "gold", hint: "Le favori peut se faire surprendre." },
+  "ouverture-chaude": { label: "Ouverture chaude", icon: Sparkles, accent: "hype", hint: "Marché ouvert, ambiance garantie." },
 };
 
 export function getMarketSignal(key: MarketSignal): MarketSignalMeta {
@@ -45,7 +59,7 @@ export function getMarketSignal(key: MarketSignal): MarketSignalMeta {
 
 interface HeatMeta {
   label: string;
-  emoji: string;
+  icon: LucideIcon;
   accent: AccentToken;
   /** 1 (chill) → 5 (insane), used for sorting & meter fill. */
   rank: number;
@@ -53,11 +67,11 @@ interface HeatMeta {
 }
 
 export const HEAT_LEVELS: Record<HeatLevel, HeatMeta> = {
-  insane: { label: "Chaud bouillant", emoji: "🌋", accent: "danger", rank: 5, glow: true },
-  very_hot: { label: "Très chaud", emoji: "🔥", accent: "danger", rank: 4, glow: true },
-  hot: { label: "Chaud", emoji: "🌶️", accent: "gold", rank: 3, glow: false },
-  for_purists: { label: "Pour les puristes", emoji: "🎯", accent: "violet", rank: 2, glow: false },
-  chill: { label: "Tranquille", emoji: "🧊", accent: "electric", rank: 1, glow: false },
+  insane: { label: "Chaud bouillant", icon: Flame, accent: "danger", rank: 5, glow: true },
+  very_hot: { label: "Très chaud", icon: Flame, accent: "danger", rank: 4, glow: true },
+  hot: { label: "Chaud", icon: Flame, accent: "gold", rank: 3, glow: false },
+  for_purists: { label: "Pour les puristes", icon: Gem, accent: "violet", rank: 2, glow: false },
+  chill: { label: "Tranquille", icon: Snowflake, accent: "electric", rank: 1, glow: false },
 };
 
 export function getHeatLabel(level: HeatLevel): HeatMeta {
@@ -66,17 +80,17 @@ export function getHeatLabel(level: HeatLevel): HeatMeta {
 
 /* ───────────────────────── Vibe & reason ───────────────────────── */
 
-export const VIBES: Record<ExpectedVibe, { emoji: string; accent: AccentToken }> = {
-  "Ambiance folle": { emoji: "🎺", accent: "danger" },
-  Tactique: { emoji: "♟️", accent: "electric" },
-  Piège: { emoji: "🪤", accent: "gold" },
-  "Gros choc": { emoji: "💥", accent: "hype" },
-  "Match de fond": { emoji: "🛋️", accent: "electric" },
+export const VIBES: Record<ExpectedVibe, { icon: LucideIcon; accent: AccentToken }> = {
+  "Ambiance folle": { icon: Flame, accent: "danger" },
+  Tactique: { icon: Brain, accent: "electric" },
+  Piège: { icon: TriangleAlert, accent: "gold" },
+  "Gros choc": { icon: Zap, accent: "hype" },
+  "Match de fond": { icon: Sofa, accent: "electric" },
 };
 
-export function getWatchMood(match: HydratedMatch): { emoji: string; label: string; accent: AccentToken } {
+export function getWatchMood(match: HydratedMatch): { icon: LucideIcon; label: string; accent: AccentToken } {
   const v = VIBES[match.expectedVibe];
-  return { emoji: v.emoji, label: match.expectedVibe, accent: v.accent };
+  return { icon: v.icon, label: match.expectedVibe, accent: v.accent };
 }
 
 export const WATCH_REASON_LABELS: Record<WatchReasonType, string> = {

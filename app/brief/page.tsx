@@ -81,7 +81,7 @@ function CopyChip({ text, label, icon: Icon, accent }: { text: string; label: st
       type="button"
       onClick={async () => {
         const ok = await copy(text);
-        toast(ok ? "Copié 📋" : "Copie impossible", ok ? "success" : "info");
+        toast(ok ? "Copié" : "Copie impossible", ok ? "success" : "info");
       }}
       className={cn(
         "tap inline-flex h-11 items-center justify-center gap-1.5 rounded-2xl border text-[13px] font-bold transition-colors",

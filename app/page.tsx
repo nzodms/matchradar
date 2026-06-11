@@ -22,21 +22,36 @@ import {
 import { cn } from "@/lib/utils";
 import type { HomeFilter } from "@/types";
 import { motion } from "framer-motion";
-import { ArrowRight, Newspaper, Radar, Rocket, Star } from "lucide-react";
+import {
+  ArrowRight,
+  BarChart3,
+  LayoutGrid,
+  MessageCircle,
+  Newspaper,
+  Radar,
+  Radio,
+  Rocket,
+  Scale,
+  Star,
+  Swords,
+  Trophy,
+  TriangleAlert,
+  type LucideIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
 type DayKey = "today" | "tomorrow" | "week" | "teams";
 
-const FILTERS: { key: HomeFilter; label: string }[] = [
-  { key: "all", label: "Tous" },
-  { key: "immanquables", label: "🚨 Immanquables" },
-  { key: "live", label: "🔴 En live" },
-  { key: "market", label: "📊 Market Pulse" },
-  { key: "serres", label: "⚖️ Serrés" },
-  { key: "outsiders", label: "⚠️ Outsiders" },
-  { key: "favori-danger", label: "🪤 Favori en danger" },
-  { key: "whatsapp", label: "📱 Pour WhatsApp" },
+const FILTERS: { key: HomeFilter; label: string; icon: LucideIcon }[] = [
+  { key: "all", label: "Tous", icon: LayoutGrid },
+  { key: "immanquables", label: "Immanquables", icon: Star },
+  { key: "live", label: "En live", icon: Radio },
+  { key: "market", label: "Market Pulse", icon: BarChart3 },
+  { key: "serres", label: "Serrés", icon: Scale },
+  { key: "outsiders", label: "Outsiders", icon: Swords },
+  { key: "favori-danger", label: "Favori en danger", icon: TriangleAlert },
+  { key: "whatsapp", label: "Pour WhatsApp", icon: MessageCircle },
 ];
 
 export default function RadarPage() {
@@ -74,8 +89,10 @@ export default function RadarPage() {
       <section className="relative -mx-4 overflow-hidden px-4 pb-2 pt-2">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }} className="relative">
           <div className="mb-3 flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-hype/25 bg-hype/8 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-hype">
-              <span className="h-1.5 w-1.5 animate-pulse-dot rounded-full bg-hype" /> 🏆 Coupe du Monde · En direct
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-hype/25 bg-hype/8 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-hype">
+              <Trophy size={11} strokeWidth={2.4} /> Coupe du Monde
+              <span className="mx-0.5 h-2.5 w-px bg-hype/30" />
+              <span className="h-1.5 w-1.5 animate-pulse-dot rounded-full bg-hype" /> En direct
             </span>
           </div>
 
@@ -158,16 +175,18 @@ export default function RadarPage() {
           <div className="no-scrollbar flex gap-1.5 overflow-x-auto px-4 pb-1">
             {FILTERS.map((f) => {
               const active = filter === f.key;
+              const Icon = f.icon;
               return (
                 <button
                   key={f.key}
                   type="button"
                   onClick={() => setFilter(f.key)}
                   className={cn(
-                    "tap shrink-0 rounded-full border px-3 py-1.5 text-[12px] font-bold transition-all",
-                    active ? "border-hype/45 bg-hype/15 text-hype shadow-glow-hype" : "border-line/10 bg-surface/40 text-muted hover:text-ink",
+                    "tap inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-semibold transition-colors",
+                    active ? "border-hype/30 bg-hype/12 text-hype" : "border-line/8 bg-surface/40 text-muted hover:text-ink",
                   )}
                 >
+                  <Icon size={13} strokeWidth={2.4} />
                   {f.label}
                 </button>
               );

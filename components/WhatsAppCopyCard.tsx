@@ -3,7 +3,7 @@
 import { useCopy } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 import { whatsAppShareUrl } from "@/lib/whatsapp";
-import { Check, Copy, MessageCircle } from "lucide-react";
+import { Check, CheckCheck, Copy, MessageCircle } from "lucide-react";
 import { useToast } from "./Toast";
 
 interface WhatsAppCopyCardProps {
@@ -40,7 +40,9 @@ export function WhatsAppCopyCard({
         <pre className="whitespace-pre-wrap break-words font-sans text-[13px] leading-relaxed text-ink/90">
           {text}
         </pre>
-        <p className="mt-1 text-right text-[10px] text-faint">à l'instant ✓✓</p>
+        <p className="mt-1 flex items-center justify-end gap-1 text-[10px] text-faint">
+          à l'instant <CheckCheck size={12} className="text-hype/70" />
+        </p>
       </div>
 
       <div className="mt-3 grid grid-cols-[1fr_auto] gap-2">
@@ -48,7 +50,7 @@ export function WhatsAppCopyCard({
           type="button"
           onClick={async () => {
             const ok = await copy(text);
-            toast(ok ? "Brief copié 📋" : "Copie impossible", ok ? "success" : "info");
+            toast(ok ? "Brief copié" : "Copie impossible", ok ? "success" : "info");
           }}
           className={cn(
             "tap inline-flex h-11 items-center justify-center gap-2 rounded-2xl font-bold transition-colors",

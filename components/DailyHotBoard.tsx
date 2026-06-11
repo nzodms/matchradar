@@ -5,6 +5,7 @@ import type { HotBoardEntry } from "@/types";
 import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { Flag } from "./Flag";
 
 /** Clean ranking board: one standout match per category. */
 export function DailyHotBoard({ entries }: { entries?: HotBoardEntry[] }) {
@@ -21,6 +22,7 @@ export function DailyHotBoard({ entries }: { entries?: HotBoardEntry[] }) {
 
 function HotBoardCard({ entry, rank, index }: { entry: HotBoardEntry; rank: number; index: number }) {
   const { match, accent } = entry;
+  const Icon = entry.icon;
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -33,11 +35,9 @@ function HotBoardCard({ entry, rank, index }: { entry: HotBoardEntry; rank: numb
 
         <div className="relative flex items-center gap-3.5">
           {/* rank */}
-          <div className="flex w-9 shrink-0 flex-col items-center justify-center">
-            <span className="font-display text-xl font-bold leading-none tabular" style={{ color: `rgb(var(--${accent}))` }}>
-              {rank}
-            </span>
-            <span className="mt-1 text-base leading-none">{entry.emoji}</span>
+          <div className="flex w-9 shrink-0 flex-col items-center justify-center gap-1.5" style={{ color: `rgb(var(--${accent}))` }}>
+            <span className="font-display text-xl font-bold leading-none tabular">{rank}</span>
+            <Icon size={15} strokeWidth={2.2} />
           </div>
 
           <span className="h-10 w-px bg-line/8" />
@@ -47,9 +47,13 @@ function HotBoardCard({ entry, rank, index }: { entry: HotBoardEntry; rank: numb
             <p className="text-[10.5px] font-semibold uppercase tracking-wide" style={{ color: `rgb(var(--${accent}))` }}>
               {entry.label}
             </p>
-            <p className="mt-0.5 truncate font-display text-[15px] font-bold leading-tight text-ink">
-              {match.home.flag} {match.home.name} <span className="text-faint">·</span> {match.away.name} {match.away.flag}
-            </p>
+            <div className="mt-1 flex items-center gap-1.5">
+              <Flag cc={match.home.countryCode} size={16} ring={false} />
+              <p className="min-w-0 truncate font-display text-[15px] font-bold leading-tight text-ink">
+                {match.home.name} <span className="text-faint">·</span> {match.away.name}
+              </p>
+              <Flag cc={match.away.countryCode} size={16} ring={false} />
+            </div>
             <p className="mt-1 line-clamp-1 text-[12px] text-muted">{entry.punch}</p>
           </div>
 

@@ -8,6 +8,7 @@ import type { HydratedMatch } from "@/types";
 export function OddsStrip({ match, className }: { match: HydratedMatch; className?: string }) {
   const fav = marketFavorite(match);
   const sig = getMarketSignal(match.marketSignal);
+  const SigIcon = sig.icon;
 
   return (
     <div className={cn("flex items-center gap-3 text-[12px]", className)}>
@@ -17,9 +18,7 @@ export function OddsStrip({ match, className }: { match: HydratedMatch; classNam
         <Odd code="N" odd={match.odds.draw} accent={sig.accent} />
         <Odd code={match.away.id.toUpperCase()} odd={match.odds.away} hot={fav.side === "away"} accent={sig.accent} />
       </div>
-      <span className="ml-auto shrink-0 text-sm" title={sig.label}>
-        {sig.emoji}
-      </span>
+      <SigIcon size={14} strokeWidth={2.4} className="ml-auto shrink-0" style={{ color: `rgb(var(--${sig.accent}))` }} aria-label={sig.label} />
     </div>
   );
 }

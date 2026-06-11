@@ -31,7 +31,7 @@ export function CalendarExportCard({ matches, className }: { matches: HydratedMa
           disabled={count === 0}
           onClick={() => {
             downloadICS(matches, "matchradar-google.ics");
-            toast("Calendrier exporté 📅");
+            toast("Calendrier exporté");
           }}
           className="tap inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-electric font-bold text-bg shadow-[0_10px_26px_-14px_rgb(var(--electric)/0.6)] disabled:opacity-40"
         >
@@ -42,7 +42,7 @@ export function CalendarExportCard({ matches, className }: { matches: HydratedMa
           disabled={count === 0}
           onClick={() => {
             downloadICS(matches, "matchradar-apple.ics");
-            toast("Fichier .ics téléchargé 🍎");
+            toast("Fichier .ics téléchargé");
           }}
           className="tap inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-surface-2/50 font-bold text-ink ring-1 ring-line/8 hover:bg-surface-2/80 disabled:opacity-40"
         >

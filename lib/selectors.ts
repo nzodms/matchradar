@@ -8,6 +8,7 @@ import type {
   HydratedMatch,
   Match,
 } from "@/types";
+import { Flame, MessageCircle, Scale, TriangleAlert, Users, type LucideIcon } from "lucide-react";
 import { formatDayLabel } from "./datetime";
 import { HEAT_LEVELS, marketBalance } from "./market";
 
@@ -101,7 +102,7 @@ interface HotBoardConfig {
   kind: HotBoardKind;
   label: string;
   punch: string;
-  emoji: string;
+  icon: LucideIcon;
   accent: HotBoardEntry["accent"];
   score: (m: HydratedMatch) => number;
 }
@@ -111,7 +112,7 @@ const HOT_BOARD: HotBoardConfig[] = [
     kind: "hottest",
     label: "Le plus chaud",
     punch: "Le match le plus chaud du jour, toutes catégories.",
-    emoji: "🌋",
+    icon: Flame,
     accent: "danger",
     score: (m) => heatRank(m) * 1000 + m.hypeScore,
   },
@@ -119,7 +120,7 @@ const HOT_BOARD: HotBoardConfig[] = [
     kind: "casual",
     label: "Pour tout le monde",
     punch: "Parfait même si tu ne suis pas tout.",
-    emoji: "🍿",
+    icon: Users,
     accent: "hype",
     score: (m) => m.casualFanScore,
   },
@@ -127,7 +128,7 @@ const HOT_BOARD: HotBoardConfig[] = [
     kind: "balanced",
     label: "Le plus serré",
     punch: "Le marché n'arrive pas à les départager.",
-    emoji: "⚖️",
+    icon: Scale,
     accent: "gold",
     score: (m) => marketBalance(m.odds) * (m.hypeScore / 100),
   },
@@ -135,7 +136,7 @@ const HOT_BOARD: HotBoardConfig[] = [
     kind: "upset",
     label: "Le favori en danger",
     punch: "Ça sent le piège pour le favori.",
-    emoji: "⚠️",
+    icon: TriangleAlert,
     accent: "violet",
     score: upsetScore,
   },
@@ -143,7 +144,7 @@ const HOT_BOARD: HotBoardConfig[] = [
     kind: "groupchat",
     label: "Le match du groupe",
     punch: "Celui qui va faire vibrer ta conversation WhatsApp.",
-    emoji: "📱",
+    icon: MessageCircle,
     accent: "electric",
     score: (m) => m.groupChatPotential,
   },
@@ -166,7 +167,7 @@ export function getTodayHotBoard(): HotBoardEntry[] {
       match: pick,
       label: cfg.label,
       punch: cfg.punch,
-      emoji: cfg.emoji,
+      icon: cfg.icon,
       accent: cfg.accent,
     });
   }

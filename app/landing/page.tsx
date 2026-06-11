@@ -14,6 +14,7 @@ import {
   MessageCircle,
   Rocket,
   Siren,
+  Trophy,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -78,8 +79,8 @@ export default function LandingPage() {
         <section className="relative -mx-4 overflow-hidden px-4 pb-4 pt-6">
           <RadarBackground accent="hype" />
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="relative">
-            <span className="inline-flex items-center gap-2 rounded-full border border-hype/25 bg-hype/8 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-hype">
-              🏆 Coupe du Monde · En direct
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-hype/25 bg-hype/8 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-hype">
+              <Trophy size={12} strokeWidth={2.4} /> Coupe du Monde · En direct
             </span>
             <h1 className="mt-4 font-display text-[34px] font-bold leading-[1.05] tracking-tight text-ink">
               Il y a trop de matchs.

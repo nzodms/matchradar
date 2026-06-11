@@ -4,6 +4,8 @@
  * calendar / scores API without touching the UI components.
  */
 
+import type { LucideIcon } from "lucide-react";
+
 export type Sport =
   | "football"
   | "tennis"
@@ -224,7 +226,7 @@ export interface HotBoardEntry {
   match: HydratedMatch;
   label: string;
   punch: string;
-  emoji: string;
+  icon: LucideIcon;
   accent: AccentToken;
 }
 
