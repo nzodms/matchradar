@@ -1,0 +1,3 @@
+# The browser extension is built and loaded locally — it is NOT a Vercel artifact.
+# Keep it out of the Vercel build context so `next build` never type-checks it.
+nonoise-extension/
