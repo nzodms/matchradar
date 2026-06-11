@@ -1,0 +1,167 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Core surfaces — deep night + pitch */
+    --bg: 5 8 14;          /* #05080E near-black blue */
+    --bg-2: 8 12 20;       /* slightly elevated backdrop */
+    --surface: 14 19 30;   /* card base */
+    --surface-2: 20 27 41; /* raised card */
+    --pitch: 6 26 18;      /* football field green-black */
+
+    /* Text */
+    --ink: 244 247 252;    /* primary text */
+    --muted: 142 152 170;  /* secondary text */
+    --faint: 90 100 118;   /* tertiary text */
+    --line: 255 255 255;   /* used with low alpha for borders */
+
+    /* Neon accents */
+    --hype: 38 245 142;    /* #26F58E neon green */
+    --danger: 255 61 87;   /* #FF3D57 neon red */
+    --gold: 255 200 61;    /* #FFC83D neon yellow */
+    --electric: 56 160 255;/* #38A0FF electric blue */
+    --violet: 149 108 255; /* #956CFF */
+  }
+
+  * {
+    border-color: rgb(var(--line) / 0.08);
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: rgb(var(--bg));
+    color: rgb(var(--ink));
+    font-family: var(--font-sans), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overscroll-behavior-y: none;
+  }
+
+  ::selection {
+    background: rgb(var(--hype) / 0.3);
+    color: rgb(var(--ink));
+  }
+
+  /* Slim, on-brand scrollbar */
+  ::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--line) / 0.12);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--line) / 0.2);
+  }
+}
+
+@layer components {
+  /* Frosted glass card — the workhorse surface */
+  .glass {
+    background: linear-gradient(
+      160deg,
+      rgb(var(--surface) / 0.9),
+      rgb(var(--bg-2) / 0.7)
+    );
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid rgb(var(--line) / 0.08);
+  }
+
+  .glass-strong {
+    background: linear-gradient(
+      160deg,
+      rgb(var(--surface-2) / 0.95),
+      rgb(var(--surface) / 0.85)
+    );
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgb(var(--line) / 0.1);
+  }
+
+  /* Thin luminous top border accent */
+  .edge-light::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(var(--line) / 0.5),
+      transparent
+    );
+  }
+
+  .text-gradient {
+    background: linear-gradient(180deg, rgb(var(--ink)), rgb(var(--muted)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .text-gradient-hype {
+    background: linear-gradient(110deg, rgb(var(--hype)), rgb(var(--electric)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Number/label treatment for scores */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  /* Section eyebrow label */
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.22em] text-faint;
+  }
+
+  /* Large touch target reset */
+  .tap {
+    @apply transition-transform duration-150 active:scale-[0.97];
+  }
+}
+
+@layer utilities {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pb-nav {
+    padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .mask-fade-x {
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent,
+      #000 6%,
+      #000 94%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent,
+      #000 6%,
+      #000 94%,
+      transparent
+    );
+  }
+}
