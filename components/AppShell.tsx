@@ -21,11 +21,12 @@ interface AppShellProps {
 export function AppShell({ children, back, title, bare, className }: AppShellProps) {
   return (
     <div className="relative min-h-[100dvh]">
-      {/* ambient backdrop */}
-      <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-bg" />
-        <div className="absolute inset-x-0 top-0 h-[420px] bg-radial-fade opacity-60" />
-        <div className="absolute inset-0 bg-grid-faint bg-[size:48px_48px] opacity-[0.35]" />
+      {/* ambient backdrop — stadium spotlights + grain + grid */}
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-bg">
+        <div className="spotlights absolute inset-0 animate-glow-pulse opacity-80" />
+        <div className="absolute inset-x-0 top-0 h-[360px] bg-radial-fade opacity-50" />
+        <div className="absolute inset-0 bg-grid-faint bg-[size:46px_46px] opacity-30" />
+        <div className="bg-noise absolute inset-0 opacity-[0.05] mix-blend-overlay" />
       </div>
 
       {!bare && <RadarHeader back={back} title={title} />}

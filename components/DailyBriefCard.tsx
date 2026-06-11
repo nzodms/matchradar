@@ -2,12 +2,14 @@
 
 import { useTimezone } from "@/components/Providers";
 import { displayTime } from "@/lib/datetime";
+import { formatOdd, getHeatLabel, marketFavorite } from "@/lib/market";
 import { cn } from "@/lib/utils";
 import type { DailyBrief } from "@/types";
-import { Lightbulb, Siren, Sparkles, Target, UserRound } from "lucide-react";
+import { Activity, Lightbulb, Siren, Sparkles, Target, UserRound } from "lucide-react";
 import Link from "next/link";
 import { HypeChip } from "./HypeScore";
 import { Logo } from "./Logo";
+import { MarketSignalBadge } from "./MarketSignalBadge";
 import { RadarBackground } from "./RadarBackground";
 
 /** Story-style shareable brief. Reads like an Instagram story visual. */
@@ -48,6 +50,7 @@ export function DailyBriefCard({ brief, className }: { brief: DailyBrief; classN
                     {m.home.name} <span className="text-faint">–</span> {m.away.name}
                   </span>
                   <span className="text-base">{m.away.flag}</span>
+                  <span className="shrink-0 text-sm leading-none">{getHeatLabel(m.heatLevel).emoji}</span>
                   <span className="shrink-0 text-[11px] font-semibold tabular text-muted">
                     {m.status === "live" ? "LIVE" : time}
                   </span>
@@ -58,7 +61,7 @@ export function DailyBriefCard({ brief, className }: { brief: DailyBrief; classN
           </div>
         </div>
 
-        {/* unmissable */}
+        {/* unmissable + market pulse */}
         <div className="mt-3 rounded-2xl border border-hype/25 bg-hype/8 p-3">
           <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-hype">
             <Siren size={13} /> À ne pas rater
@@ -70,6 +73,25 @@ export function DailyBriefCard({ brief, className }: { brief: DailyBrief; classN
               {brief.unmissable.away.name} {brief.unmissable.away.flag}
             </p>
             <HypeChip score={brief.unmissable.hypeScore} />
+          </div>
+          <div className="mt-2 flex items-center gap-2 border-t border-hype/15 pt-2">
+            <Activity size={12} className="shrink-0 text-gold" />
+            <span className="text-[11px] font-semibold tabular text-muted">
+              {(() => {
+                const m = brief.unmissable;
+                const fav = marketFavorite(m);
+                return (
+                  <>
+                    <span className={fav.side === "home" ? "text-gold" : "text-faint"}>{m.home.id.toUpperCase()}</span> {formatOdd(m.odds.home)}
+                    <span className="px-1 text-faint/60">·</span>
+                    <span className="text-faint">N</span> {formatOdd(m.odds.draw)}
+                    <span className="px-1 text-faint/60">·</span>
+                    <span className={fav.side === "away" ? "text-gold" : "text-faint"}>{m.away.id.toUpperCase()}</span> {formatOdd(m.odds.away)}
+                  </>
+                );
+              })()}
+            </span>
+            <MarketSignalBadge signal={brief.unmissable.marketSignal} size="sm" className="ml-auto" />
           </div>
         </div>
 

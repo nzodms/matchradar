@@ -1,12 +1,13 @@
 "use client";
 
-import { FeaturedMatchCard } from "@/components/FeaturedMatchCard";
+import { HotMatchHero } from "@/components/HotMatchHero";
 import { Logo } from "@/components/Logo";
 import { RadarBackground } from "@/components/RadarBackground";
-import { matchOfTheDay } from "@/lib/selectors";
+import { matchOfTheDay, todaysMatches } from "@/lib/selectors";
 import type { AccentToken } from "@/types";
 import { motion } from "framer-motion";
 import {
+  Activity,
   ArrowRight,
   CalendarHeart,
   Flame,
@@ -31,6 +32,12 @@ const FEATURES: { icon: LucideIcon; accent: AccentToken; title: string; text: st
     text: "Enjeu, rivalité, stars, ambiance : chaque match noté sur 100. Fini de deviner.",
   },
   {
+    icon: Activity,
+    accent: "gold",
+    title: "Le Market Pulse en un coup d'œil",
+    text: "Cotes indicatives, favori, match serré ou piège : tu sais direct ce que vaut l'affiche.",
+  },
+  {
     icon: CalendarHeart,
     accent: "electric",
     title: "Ton calendrier personnalisé",
@@ -45,7 +52,8 @@ const FEATURES: { icon: LucideIcon; accent: AccentToken; title: string; text: st
 ];
 
 export default function LandingPage() {
-  const featured = matchOfTheDay();
+  const upcoming = todaysMatches().filter((m) => m.status !== "live");
+  const featured = upcoming.sort((a, b) => b.hypeScore - a.hypeScore)[0] ?? matchOfTheDay();
 
   return (
     <div className="relative min-h-[100dvh] overflow-hidden">
@@ -111,7 +119,7 @@ export default function LandingPage() {
         {/* live proof */}
         <section className="mt-6">
           <p className="eyebrow mb-2">Aperçu en direct</p>
-          <FeaturedMatchCard match={featured} />
+          <HotMatchHero match={featured} eyebrow="Le match à ne pas rater" />
         </section>
 
         {/* features */}

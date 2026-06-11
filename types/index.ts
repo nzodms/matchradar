@@ -91,6 +91,40 @@ export interface KeyPlayer {
   note: string;
 }
 
+/* ───────────────────────── Market Pulse ───────────────────────── */
+
+/** Market reading of a match — never a betting incentive, just a signal. */
+export type MarketSignal =
+  | "affiche-brulante"
+  | "favori-clair"
+  | "match-serre"
+  | "outsider-dangereux"
+  | "piege-possible"
+  | "ouverture-chaude";
+
+export type HeatLevel = "chill" | "for_purists" | "hot" | "very_hot" | "insane";
+
+export type ExpectedVibe = "Ambiance folle" | "Tactique" | "Piège" | "Gros choc" | "Match de fond";
+
+export type WatchReasonType = "rivalry" | "stars" | "stakes" | "upset" | "ambiance" | "casual";
+
+/** Indicative 1-N-2 decimal odds (informational only). */
+export interface Odds {
+  home: number;
+  draw: number;
+  away: number;
+}
+
+/** Scaffolding for a future odds API. Mock-only in V1 — no bookmaker link shown. */
+export interface OddsMeta {
+  sourceType: "mock" | "api";
+  oddsProvider: string | null;
+  providerCountry: string;
+  isLegalProvider: boolean;
+  /** Intentionally unused in V1. */
+  affiliateUrl: string | null;
+}
+
 export interface Match {
   id: string;
   eventId: string;
@@ -133,6 +167,32 @@ export interface Match {
   whatsappBrief: string;
   broadcasters: string[];
   verdict: string;
+
+  /* ── Market Pulse (cotes indicatives) ── */
+  odds: Odds;
+  marketSignal: MarketSignal;
+  marketCopy: string;
+  marketUpdatedMinAgo: number;
+
+  /* ── Heat & vibe ── */
+  heatLevel: HeatLevel;
+  expectedVibe: ExpectedVibe;
+  emotionalTag: string;
+  watchReasonType: WatchReasonType;
+  keyStat: string;
+  storylines: string[];
+
+  /* ── Audience scores (0–100) ── */
+  groupChatPotential: number;
+  casualFanScore: number;
+  hardcoreFanScore: number;
+  tensionScore: number;
+  upsetPotential: number;
+  favoriteRisk: number;
+
+  /* ── Verdicts ── */
+  watchVerdictShort: string;
+  watchVerdictLong: string;
 }
 
 /** A team hydrated onto a match for convenient rendering. */
@@ -145,11 +205,40 @@ export interface DailyBrief {
   dateLabel: string;
   threeToWatch: HydratedMatch[];
   unmissable: HydratedMatch;
+  hotMatch: HydratedMatch;
   playerToWatch: KeyPlayer & { matchId: string };
   funFact: string;
+  /** Standard group message. */
   groupMessage: string;
+  /** Punchy one-liner. */
+  shortMessage: string;
+  /** Looser, funnier variant. */
+  funnyMessage: string;
   verdict: string;
 }
+
+export type HotBoardKind = "hottest" | "casual" | "balanced" | "upset" | "groupchat";
+
+export interface HotBoardEntry {
+  kind: HotBoardKind;
+  match: HydratedMatch;
+  label: string;
+  punch: string;
+  emoji: string;
+  accent: AccentToken;
+}
+
+export type HomeFilter =
+  | "all"
+  | "immanquables"
+  | "live"
+  | "market"
+  | "serres"
+  | "outsiders"
+  | "favori-danger"
+  | "whatsapp";
+
+export type TeamAlertLevel = "high" | "big-only" | "all";
 
 export type FanLevel = "gros-matchs" | "mon-pays" | "tout" | "hype";
 

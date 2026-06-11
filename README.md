@@ -5,12 +5,17 @@ _Le radar des événements sportifs à ne pas rater._
 
 MatchRadar est une web app **mobile-first, dark, premium** qui aide à savoir quels
 matchs/événements sportifs regarder aujourd'hui, demain et cette semaine — via un
-**score de hype**, des **recommandations personnalisées**, un **brief quotidien
-partageable** et l'**export calendrier**.
+**score de hype**, une couche **Market Pulse** (cotes indicatives), des
+**recommandations personnalisées**, un **brief quotidien partageable** et l'**export
+calendrier**.
 
-> ⚠️ Ce n'est **pas** une app de paris. Aucune cote, aucune mise, aucun bonus.
-> On s'inspire de l'énergie sportive (cartes, badges, live, densité) pour un outil
-> 100 % légal et grand public.
+> ⚠️ Ce n'est **pas** une app de paris. Les cotes affichées sont un **signal sportif
+> informatif** ("le marché voit quoi ?"), jamais une incitation. Pas de bouton
+> « parier », pas de mise, pas de bonus, pas de lien bookmaker. Outil 100 % légal,
+> grand public, qui dit juste **quels matchs regarder**.
+>
+> _Cotes indicatives, susceptibles d'évoluer. Jeu d'argent réservé aux 18+. Jouer
+> comporte des risques. MatchRadar ne fournit pas de conseil de pari._
 
 Le lancement se fait sur la **Coupe du Monde**, avec une roadmap déjà prête :
 Wimbledon, Tour de France, F1, UFC, NBA, Ligue des Champions, Roland-Garros, CAN,
@@ -40,15 +45,15 @@ npm run typecheck
 
 ## 🗺️ Pages
 
-| Route          | Rôle                                                                 |
-| -------------- | ------------------------------------------------------------------- |
-| `/`            | **Radar du jour** — hero, match du jour, programme, tabs            |
-| `/match/[id]`  | **Détail match** — hype, enjeux, scénario, joueurs, brief, calendrier|
-| `/brief`       | **Brief du jour** — carte partageable + message WhatsApp prêt        |
-| `/calendar`    | **Calendrier perso** — formulaire → recommandations → export        |
-| `/favorites`   | **Équipes favorites** — recherche, favoris, matchs des équipes       |
-| `/events`      | **Prochainement** — roadmap des futurs radars                        |
-| `/landing`     | **Landing marketing** — page de pub immersive                        |
+| Route          | Rôle                                                                          |
+| -------------- | ----------------------------------------------------------------------------- |
+| `/`            | **Radar du jour** — hero "Ce soir tu regardes quoi ?", ticker live, affiche chaude, Hot Board, Market Pulse, filtres |
+| `/match/[id]`  | **Détail match** — hype, heat meter, Market Pulse complet, scénario, storylines, joueurs, brief |
+| `/brief`       | **Brief du jour** — carte partageable + versions courte / complète / drôle    |
+| `/calendar`    | **Construis ton radar** — formulaire + inclusions → recommandations → export   |
+| `/favorites`   | **Équipes favorites** — niveau d'alerte par équipe, prochain match, Market Pulse |
+| `/events`      | **Prochainement** — roadmap, Wimbledon en avant, vote du prochain radar        |
+| `/landing`     | **Landing marketing** — page de pub immersive                                  |
 
 Navigation : **bottom nav** fixe mobile (blur) — Radar · Brief · Calendrier ·
 Favoris · Prochainement.
@@ -73,18 +78,56 @@ hype = teamPopularity + stakes + rivalry + starPower + accessibility + storyFact
 
 Le détail des facteurs est affiché en barres animées sur la page match.
 
+## 📊 Market Pulse (cotes indicatives) — V2
+
+Couche de lecture du marché, présentée comme un **signal sportif**, jamais comme une
+incitation. Logique dans [`lib/market.ts`].
+
+- **Cotes 1-N-2** dé-viggées → favori + probabilités (`marketFavorite`, `impliedProbabilities`)
+- **Équilibre** du match 0–100 (`marketBalance`) → bloc « match serré »
+- **Signal** par match : `affiche-brulante`, `favori-clair`, `match-serre`,
+  `outsider-dangereux`, `piege-possible`, `ouverture-chaude`
+- **Heat level** (`chill` → `insane`) + jauge 5 segments (`MatchHeatMeter`)
+- **Verdicts d'audience** : casual / hardcore / groupe WhatsApp
+- **Hot Board** arcade (`getTodayHotBoard`) : le plus chaud, le plus serré, le favori
+  en danger, le match du groupe…
+- **Filtres** home : Immanquables · Live · Market Pulse · Serrés · Outsiders ·
+  Favori en danger · Pour WhatsApp (`applyHomeFilter`)
+
+Le **`ResponsibleGamingNote`** est affiché partout où des cotes apparaissent (page
+match, blocs Market Pulse) et **aucun lien bookmaker** n'est présent en V1/V2.
+
+### Brancher une vraie API de cotes plus tard
+
+`data/matches.ts` exporte `ODDS_META` (`sourceType`, `oddsProvider`, `providerCountry`,
+`isLegalProvider`, `affiliateUrl`). En V1/V2 : `sourceType: "mock"`, `affiliateUrl: null`
+(jamais affiché). Remplacer les `odds` mockées par l'API suffit — l'UI ne change pas.
+
+## ✏️ Modifier les matchs / les cotes
+
+Tout est dans **`data/matches.ts`** (un objet `Match` par affiche). Pour changer un
+match : éditer `hypeScore`, `odds`, `marketSignal`, `marketCopy`, `heatLevel`,
+`storylines`, `watchVerdictShort/Long`, etc. `dayOffset` (0 = aujourd'hui) garde la
+démo « evergreen ». Les équipes sont dans `data/teams.ts`, les événements à venir dans
+`data/events.ts`.
+
 ## 🏗️ Architecture & branchement API
 
 Tout est **mocké proprement** dans `data/` et structuré pour brancher une API plus tard
 sans toucher l'UI :
 
 ```
-data/        events.ts · matches.ts · teams.ts        ← données mockées (à remplacer par l'API)
-lib/         hype · badges · datetime · whatsapp · calendar · selectors
-components/   ~25 composants réutilisables (MatchCard, HypeScore, DailyBriefCard…)
-types/       contrat de données unique (Match, Team, SportEvent, DailyBrief…)
+data/        events.ts · matches.ts (+ ODDS_META) · teams.ts   ← données mockées (→ API)
+lib/         hype · market · badges · datetime · whatsapp · calendar · selectors
+components/   ~35 composants réutilisables
+types/       contrat de données unique (Match, Odds, MarketSignal, HotBoardEntry…)
 app/         pages (App Router)
 ```
+
+Composants V2 ajoutés : `MarketPulseCard`, `OddsPill`, `OddsStrip`, `MarketSignalBadge`,
+`MatchHeatMeter`, `HotMatchHero`, `DailyHotBoard`, `HotMarketSection`, `SportTicker`,
+`ResponsibleGamingNote`, et les variantes de carte (`HotMatchCard`, `LiveMatchCard`,
+`ChillMatchCard`, `MarketMatchCard`, `BriefMatchCard`).
 
 Points d'extension prévus :
 
@@ -96,9 +139,10 @@ Points d'extension prévus :
 
 ## 🎨 Design system
 
-- Dark profond (noir bleuté / vert terrain), accents néon (vert, rouge, jaune, bleu).
-- Glassmorphism, bordures lumineuses, glows par palier de score.
-- Fond **radar animé** (sweep + blips + grille), 100 % CSS (GPU-friendly).
+- Dark profond (noir bleuté / vert terrain), accents néon (vert, rouge, jaune, bleu, violet).
+- Glassmorphism + **cartes arcade** (bordures épaisses, sheen, ombres fortes), glows par chaleur.
+- Fond **stade vivant** : spotlights colorés animés + grain + grille + radar animé (100 % CSS).
+- Énergie « sport TV / Winamax‑like » : badges puissants, ticker live, cotes en gros blocs.
 - Tokens dans `app/globals.css` (`:root`) → themables par événement (`themeColor`).
 
 ## 🔥 Fonctionnalités virales

@@ -3,9 +3,9 @@
 import { AlertSignupCard } from "@/components/AlertSignupCard";
 import { AppShell } from "@/components/AppShell";
 import { CalendarExportCard } from "@/components/CalendarExportCard";
+import { MatchCardSkeleton } from "@/components/LoadingSkeleton";
 import { MatchCard } from "@/components/MatchCard";
 import { useFavorites, useTimezone } from "@/components/Providers";
-import { MatchCardSkeleton } from "@/components/LoadingSkeleton";
 import { SectionTitle } from "@/components/SectionTitle";
 import { TeamPicker } from "@/components/TeamPicker";
 import { TEAMS } from "@/data/teams";
@@ -14,7 +14,7 @@ import { allMatches, byHype } from "@/lib/selectors";
 import { cn } from "@/lib/utils";
 import type { FanLevel, HydratedMatch, TimeSlot } from "@/types";
 import { motion } from "framer-motion";
-import { CalendarHeart, Check, Globe2, Moon, Sparkles, Sun, Sunrise, Sunset, Users, Zap } from "lucide-react";
+import { Check, Globe2, Hammer, Moon, Sparkles, Sun, Sunrise, Sunset, Users, Zap } from "lucide-react";
 import { useMemo, useState } from "react";
 
 const FAN_LEVELS: { key: FanLevel; label: string; hint: string; icon: typeof Zap }[] = [
@@ -31,6 +31,14 @@ const SLOTS: { key: TimeSlot; label: string; icon: typeof Sun; range: string }[]
   { key: "nuit", label: "Nuit", icon: Moon, range: "23h–6h" },
 ];
 
+type Inclusion = "market" | "immanquables" | "pays" | "brulantes";
+const INCLUSIONS: { key: Inclusion; label: string }[] = [
+  { key: "brulantes", label: "🔥 Affiches brûlantes" },
+  { key: "market", label: "📊 Fort Market Pulse" },
+  { key: "pays", label: "🏳️ Matchs de mon pays" },
+  { key: "immanquables", label: "🚨 Seulement immanquables" },
+];
+
 function bucket(time: string): TimeSlot {
   const h = Number(time.split(":")[0]);
   if (h >= 6 && h < 12) return "matin";
@@ -39,6 +47,12 @@ function bucket(time: string): TimeSlot {
   return "nuit";
 }
 
+const isPiege = (m: HydratedMatch) =>
+  m.tags.includes("favori-en-danger") || m.marketSignal === "outsider-dangereux" || m.marketSignal === "piege-possible";
+const isHot = (m: HydratedMatch) => m.heatLevel === "insane" || m.heatLevel === "very_hot";
+const isMarket = (m: HydratedMatch) =>
+  ["affiche-brulante", "match-serre", "outsider-dangereux", "piege-possible"].includes(m.marketSignal);
+
 export default function CalendarPage() {
   const { favorites } = useFavorites();
   const { tzId, setTzId } = useTimezone();
@@ -46,28 +60,49 @@ export default function CalendarPage() {
   const [country, setCountry] = useState("fra");
   const [fanLevel, setFanLevel] = useState<FanLevel>("hype");
   const [slots, setSlots] = useState<TimeSlot[]>(["soir", "apres-midi"]);
+  const [inclusions, setInclusions] = useState<Inclusion[]>(["brulantes", "pays"]);
   const [generating, setGenerating] = useState(false);
   const [generated, setGenerated] = useState(false);
 
   const countries = useMemo(() => [...TEAMS].sort((a, b) => a.name.localeCompare(b.name)), []);
 
   const recommended = useMemo<HydratedMatch[]>(() => {
-    let pool = allMatches();
     const favSet = new Set([...favorites, country]);
+    const all = allMatches();
 
-    if (fanLevel === "gros-matchs") pool = pool.filter((m) => m.hypeScore >= 80);
-    else if (fanLevel === "hype") pool = pool.filter((m) => m.hypeScore >= 70);
+    // base pool from fan level
+    let base = all;
+    if (fanLevel === "gros-matchs") base = all.filter((m) => m.hypeScore >= 80);
+    else if (fanLevel === "hype") base = all.filter((m) => m.hypeScore >= 70);
     else if (fanLevel === "mon-pays")
-      pool = pool.filter((m) => favSet.has(m.homeTeamId) || favSet.has(m.awayTeamId) || m.hypeScore >= 90);
+      base = all.filter((m) => favSet.has(m.homeTeamId) || favSet.has(m.awayTeamId) || m.hypeScore >= 90);
 
-    if (slots.length > 0 && slots.length < 4) {
-      pool = pool.filter((m) => slots.includes(bucket(m.time)));
-    }
-    return pool.sort(byHype);
-  }, [favorites, country, fanLevel, slots]);
+    // additive inclusions
+    const pool = new Set(base);
+    if (inclusions.includes("brulantes")) all.filter(isHot).forEach((m) => pool.add(m));
+    if (inclusions.includes("market")) all.filter(isMarket).forEach((m) => pool.add(m));
+    if (inclusions.includes("pays")) all.filter((m) => favSet.has(m.homeTeamId) || favSet.has(m.awayTeamId)).forEach((m) => pool.add(m));
 
-  const toggleSlot = (s: TimeSlot) =>
-    setSlots((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]));
+    let result = [...pool];
+    if (inclusions.includes("immanquables")) result = result.filter((m) => m.hypeScore >= 90);
+    if (slots.length > 0 && slots.length < 4) result = result.filter((m) => slots.includes(bucket(m.time)));
+
+    return result.sort(byHype);
+  }, [favorites, country, fanLevel, slots, inclusions]);
+
+  const stats = useMemo(
+    () => ({
+      total: recommended.length,
+      immanquables: recommended.filter((m) => m.hypeScore >= 90).length,
+      pieges: recommended.filter(isPiege).length,
+      live: recommended.filter((m) => m.status === "live").length,
+      hot: recommended.filter(isHot).length,
+    }),
+    [recommended],
+  );
+
+  const toggleSlot = (s: TimeSlot) => setSlots((p) => (p.includes(s) ? p.filter((x) => x !== s) : [...p, s]));
+  const toggleInc = (i: Inclusion) => setInclusions((p) => (p.includes(i) ? p.filter((x) => x !== i) : [...p, i]));
 
   const generate = () => {
     setGenerating(true);
@@ -83,15 +118,15 @@ export default function CalendarPage() {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
         <div className="mb-4 flex items-center gap-2">
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-electric/15 text-electric ring-1 ring-electric/30">
-            <CalendarHeart size={18} />
+            <Hammer size={18} />
           </span>
           <div>
             <p className="eyebrow">Ton calendrier sportif</p>
-            <h1 className="font-display text-xl font-bold leading-tight text-ink">Personnalise ton radar</h1>
+            <h1 className="font-display text-xl font-bold leading-tight text-ink">Construis ton radar</h1>
           </div>
         </div>
         <p className="mb-5 text-sm leading-snug text-muted">
-          Réponds à 4 questions, on te sort le calendrier des matchs faits pour toi — exportable en un tap.
+          Quelques réglages, et on te sort le calendrier des matchs faits pour toi — exportable en un tap.
         </p>
       </motion.div>
 
@@ -100,32 +135,19 @@ export default function CalendarPage() {
         <Field label="Ton pays">
           <SelectShell>
             <Globe2 size={16} className="text-faint" />
-            <select
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-              className="w-full bg-transparent text-sm font-semibold text-ink outline-none"
-            >
+            <select value={country} onChange={(e) => setCountry(e.target.value)} className="w-full bg-transparent text-sm font-semibold text-ink outline-none">
               {countries.map((t) => (
-                <option key={t.id} value={t.id} className="bg-surface text-ink">
-                  {t.flag} {t.name}
-                </option>
+                <option key={t.id} value={t.id} className="bg-surface text-ink">{t.flag} {t.name}</option>
               ))}
             </select>
           </SelectShell>
         </Field>
-
         <Field label="Ton fuseau horaire">
           <SelectShell>
             <Globe2 size={16} className="text-faint" />
-            <select
-              value={tzId}
-              onChange={(e) => setTzId(e.target.value)}
-              className="w-full bg-transparent text-sm font-semibold text-ink outline-none"
-            >
+            <select value={tzId} onChange={(e) => setTzId(e.target.value)} className="w-full bg-transparent text-sm font-semibold text-ink outline-none">
               {TIMEZONES.map((tz) => (
-                <option key={tz.id} value={tz.id} className="bg-surface text-ink">
-                  {tz.label}
-                </option>
+                <option key={tz.id} value={tz.id} className="bg-surface text-ink">{tz.label}</option>
               ))}
             </select>
           </SelectShell>
@@ -139,23 +161,11 @@ export default function CalendarPage() {
             const active = fanLevel === lvl.key;
             const Icon = lvl.icon;
             return (
-              <button
-                key={lvl.key}
-                type="button"
-                onClick={() => setFanLevel(lvl.key)}
-                className={cn(
-                  "tap relative flex flex-col items-start gap-1.5 rounded-2xl border p-3 text-left transition-all",
-                  active ? "border-hype/45 bg-hype/10 shadow-glow-hype" : "border-line/10 bg-surface/40",
-                )}
-              >
+              <button key={lvl.key} type="button" onClick={() => setFanLevel(lvl.key)} className={cn("tap relative flex flex-col items-start gap-1.5 rounded-2xl border p-3 text-left transition-all", active ? "border-hype/45 bg-hype/10 shadow-glow-hype" : "border-line/10 bg-surface/40")}>
                 <Icon size={18} className={active ? "text-hype" : "text-muted"} />
                 <span className="font-display text-[13px] font-bold leading-tight text-ink">{lvl.label}</span>
                 <span className="text-[10.5px] text-faint">{lvl.hint}</span>
-                {active && (
-                  <span className="absolute right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full bg-hype text-bg">
-                    <Check size={10} strokeWidth={3} />
-                  </span>
-                )}
+                {active && <span className="absolute right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full bg-hype text-bg"><Check size={10} strokeWidth={3} /></span>}
               </button>
             );
           })}
@@ -169,18 +179,24 @@ export default function CalendarPage() {
             const active = slots.includes(s.key);
             const Icon = s.icon;
             return (
-              <button
-                key={s.key}
-                type="button"
-                onClick={() => toggleSlot(s.key)}
-                className={cn(
-                  "tap flex flex-col items-center gap-1 rounded-2xl border py-2.5 transition-all",
-                  active ? "border-electric/45 bg-electric/10" : "border-line/10 bg-surface/40",
-                )}
-              >
+              <button key={s.key} type="button" onClick={() => toggleSlot(s.key)} className={cn("tap flex flex-col items-center gap-1 rounded-2xl border py-2.5 transition-all", active ? "border-electric/45 bg-electric/10" : "border-line/10 bg-surface/40")}>
                 <Icon size={18} className={active ? "text-electric" : "text-muted"} />
                 <span className="text-[11px] font-bold text-ink">{s.label}</span>
                 <span className="text-[9px] text-faint">{s.range}</span>
+              </button>
+            );
+          })}
+        </div>
+      </Field>
+
+      {/* Inclusions */}
+      <Field label="Ce que tu veux dans ton radar" className="mt-4">
+        <div className="flex flex-wrap gap-2">
+          {INCLUSIONS.map((inc) => {
+            const active = inclusions.includes(inc.key);
+            return (
+              <button key={inc.key} type="button" onClick={() => toggleInc(inc.key)} className={cn("tap rounded-full border px-3 py-2 text-[12.5px] font-bold transition-all", active ? "border-gold/45 bg-gold/12 text-gold shadow-hot-gold" : "border-line/10 bg-surface/40 text-muted")}>
+                {inc.label}
               </button>
             );
           })}
@@ -192,35 +208,37 @@ export default function CalendarPage() {
         <TeamPicker limit={6} />
       </Field>
 
-      {/* Generate */}
-      <button
-        type="button"
-        onClick={generate}
-        className="tap mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-hype py-4 font-display text-base font-bold text-bg shadow-glow-hype"
-      >
+      <button type="button" onClick={generate} className="tap mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-hype py-4 font-display text-base font-bold text-bg shadow-glow-hype">
         <Zap size={18} className="fill-bg" /> {generated ? "Mettre à jour mon radar" : "Générer mon radar"}
       </button>
 
       {/* Result */}
       {generated && (
         <section id="radar-result" className="mt-7 scroll-mt-20">
-          <div className="mb-3 rounded-3xl border border-hype/25 bg-hype/8 p-4 text-center">
-            <Sparkles size={20} className="mx-auto mb-1.5 text-hype" />
-            <p className="font-display text-lg font-bold text-ink">Ton radar est prêt.</p>
-            <p className="text-sm text-muted">
-              On te recommande{" "}
-              <span className="font-bold text-hype tabular">{recommended.length}</span> match
-              {recommended.length > 1 ? "s" : ""} cette semaine.
+          <div className="card-arcade sheen relative overflow-hidden rounded-3xl border-hype/25 p-5 text-center" style={{ boxShadow: "0 0 0 1px rgb(var(--hype) / 0.25), 0 24px 50px -28px rgb(var(--hype) / 0.5)" }}>
+            <span className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-hype/20 blur-3xl" />
+            <Sparkles size={22} className="mx-auto mb-1.5 text-hype" />
+            <p className="font-display text-xl font-bold text-ink">Ton radar est prêt.</p>
+            <p className="mt-0.5 text-sm text-muted">
+              Tu as <span className="font-bold text-hype tabular">{stats.total}</span> match{stats.total > 1 ? "s" : ""} chaud{stats.total > 1 ? "s" : ""} sur ton radar.
             </p>
+            <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+              <ResultPill emoji="🚨" value={stats.immanquables} label="immanquables" accent="danger" />
+              <ResultPill emoji="🪤" value={stats.pieges} label="pièges" accent="gold" />
+              {stats.live > 0 && <ResultPill emoji="🔴" value={stats.live} label="en live" accent="danger" />}
+              <ResultPill emoji="🔥" value={stats.hot} label="chauds" accent="hype" />
+            </div>
           </div>
 
           {!generating && recommended.length > 0 && (
-            <div className="mb-4">
+            <div className="mt-4">
               <CalendarExportCard matches={recommended} />
             </div>
           )}
 
-          <SectionTitle eyebrow="Sélection pour toi" title="Tes matchs à suivre" />
+          <div className="mt-5">
+            <SectionTitle eyebrow="Aperçu du calendrier" title="Tes matchs à suivre" />
+          </div>
           <div className="space-y-3">
             {generating ? (
               <>
@@ -228,23 +246,31 @@ export default function CalendarPage() {
                 <MatchCardSkeleton />
                 <MatchCardSkeleton />
               </>
-            ) : (
+            ) : recommended.length > 0 ? (
               recommended.map((m, i) => <MatchCard key={m.id} match={m} index={i} />)
+            ) : (
+              <p className="rounded-2xl border border-line/10 bg-surface/40 p-6 text-center text-sm text-muted">
+                Aucun match avec ces réglages. Élargis tes créneaux ou tes inclusions.
+              </p>
             )}
           </div>
 
           {!generating && (
             <div className="mt-5">
-              <AlertSignupCard
-                title="Reçois ce radar chaque matin"
-                subtitle="Ton calendrier perso et le brief du jour directement par email."
-                cta="Recevoir le brief"
-              />
+              <AlertSignupCard title="Reçois ce radar chaque matin" subtitle="Ton calendrier perso et le brief du jour directement par email." cta="Recevoir le brief" />
             </div>
           )}
         </section>
       )}
     </AppShell>
+  );
+}
+
+function ResultPill({ emoji, value, label, accent }: { emoji: string; value: number; label: string; accent: string }) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-bold" style={{ color: `rgb(var(--${accent}))`, borderColor: `rgb(var(--${accent}) / 0.35)`, background: `rgb(var(--${accent}) / 0.1)` }}>
+      {emoji} <span className="tabular">{value}</span> <span className="text-muted">{label}</span>
+    </span>
   );
 }
 
@@ -258,9 +284,5 @@ function Field({ label, children, className }: { label: string; children: React.
 }
 
 function SelectShell({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex h-12 items-center gap-2 rounded-2xl border border-line/10 bg-surface/50 px-3 focus-within:border-hype/40">
-      {children}
-    </div>
-  );
+  return <div className="flex h-12 items-center gap-2 rounded-2xl border border-line/10 bg-surface/50 px-3 focus-within:border-hype/40">{children}</div>;
 }

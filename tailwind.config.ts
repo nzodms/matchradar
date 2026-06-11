@@ -45,6 +45,8 @@ const config: Config = {
         "glow-electric": "0 0 0 1px rgb(var(--electric) / 0.35), 0 0 28px -4px rgb(var(--electric) / 0.45)",
         card: "0 1px 0 0 rgb(255 255 255 / 0.04) inset, 0 24px 48px -24px rgb(0 0 0 / 0.8)",
         "card-hover": "0 1px 0 0 rgb(255 255 255 / 0.08) inset, 0 30px 60px -20px rgb(0 0 0 / 0.9)",
+        hot: "0 0 0 1px rgb(var(--danger) / 0.4), 0 0 44px -6px rgb(var(--danger) / 0.6)",
+        "hot-gold": "0 0 0 1px rgb(var(--gold) / 0.4), 0 0 40px -6px rgb(var(--gold) / 0.55)",
       },
       backgroundImage: {
         "radial-fade": "radial-gradient(ellipse at top, rgb(var(--electric) / 0.18), transparent 60%)",
@@ -80,6 +82,14 @@ const config: Config = {
           "0%": { transform: "translateX(0)" },
           "100%": { transform: "translateX(-50%)" },
         },
+        "glow-pulse": {
+          "0%, 100%": { opacity: "0.55" },
+          "50%": { opacity: "1" },
+        },
+        "heat-bar": {
+          "0%, 100%": { transform: "scaleX(0.7)", opacity: "0.7" },
+          "50%": { transform: "scaleX(1)", opacity: "1" },
+        },
       },
       animation: {
         "radar-sweep": "radar-sweep 4s linear infinite",
@@ -89,6 +99,9 @@ const config: Config = {
         "float-up": "float-up 0.5s ease-out both",
         "scan": "scan 3.5s ease-in-out infinite",
         "marquee": "marquee 28s linear infinite",
+        "marquee-fast": "marquee 20s linear infinite",
+        "glow-pulse": "glow-pulse 3s ease-in-out infinite",
+        "heat-bar": "heat-bar 2.4s ease-in-out infinite",
       },
     },
   },

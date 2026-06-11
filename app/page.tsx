@@ -1,55 +1,67 @@
 "use client";
 
 import { AppShell } from "@/components/AppShell";
+import { DailyHotBoard } from "@/components/DailyHotBoard";
 import { EventSwitcher } from "@/components/EventSwitcher";
-import { FeaturedMatchCard } from "@/components/FeaturedMatchCard";
-import { MatchCard } from "@/components/MatchCard";
-import { useFavorites } from "@/components/Providers";
-import { RadarBackground } from "@/components/RadarBackground";
-import { SectionTitle } from "@/components/SectionTitle";
-import { Tabs, type TabOption } from "@/components/Tabs";
+import { HotMarketSection } from "@/components/HotMarketSection";
+import { HotMatchHero } from "@/components/HotMatchHero";
 import { EmptyState } from "@/components/EmptyState";
-import { ACTIVE_EVENT } from "@/data/events";
+import { LiveMatchCard, MatchCard } from "@/components/MatchCard";
+import { useFavorites } from "@/components/Providers";
+import { SectionTitle } from "@/components/SectionTitle";
+import { SportTicker } from "@/components/SportTicker";
+import { Tabs, type TabOption } from "@/components/Tabs";
 import {
+  applyHomeFilter,
+  liveMatches,
   matchOfTheDay,
   matchesForOffset,
   matchesForTeams,
   todaysMatches,
 } from "@/lib/selectors";
+import { cn } from "@/lib/utils";
+import type { HomeFilter } from "@/types";
 import { motion } from "framer-motion";
 import { ArrowRight, Newspaper, Radar, Rocket, Star } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-type TabKey = "today" | "tomorrow" | "week" | "teams";
+type DayKey = "today" | "tomorrow" | "week" | "teams";
+
+const FILTERS: { key: HomeFilter; label: string }[] = [
+  { key: "all", label: "Tous" },
+  { key: "immanquables", label: "🚨 Immanquables" },
+  { key: "live", label: "🔴 En live" },
+  { key: "market", label: "📊 Market Pulse" },
+  { key: "serres", label: "⚖️ Serrés" },
+  { key: "outsiders", label: "⚠️ Outsiders" },
+  { key: "favori-danger", label: "🪤 Favori en danger" },
+  { key: "whatsapp", label: "📱 Pour WhatsApp" },
+];
 
 export default function RadarPage() {
   const { favorites } = useFavorites();
-  const [tab, setTab] = useState<TabKey>("today");
+  const [day, setDay] = useState<DayKey>("today");
+  const [filter, setFilter] = useState<HomeFilter>("all");
 
-  const featured = matchOfTheDay();
   const today = todaysMatches();
   const tomorrow = useMemo(() => matchesForOffset((o) => o === 1), []);
   const week = useMemo(() => matchesForOffset((o) => o >= 2), []);
   const teamMatches = useMemo(() => matchesForTeams(favorites), [favorites]);
+  const live = liveMatches();
+
+  // The headline affiche = hottest upcoming today (falls back to match of the day).
+  const affiche = useMemo(
+    () => today.filter((m) => m.status !== "live").sort((a, b) => b.hypeScore - a.hypeScore)[0] ?? matchOfTheDay(),
+    [today],
+  );
 
   const immanquables = today.filter((m) => m.hypeScore >= 90).length;
-  const liveNow = today.filter((m) => m.status === "live").length;
 
-  const list = useMemo(() => {
-    switch (tab) {
-      case "today":
-        return today.filter((m) => m.id !== featured.id);
-      case "tomorrow":
-        return tomorrow;
-      case "week":
-        return week;
-      case "teams":
-        return teamMatches;
-    }
-  }, [tab, today, tomorrow, week, teamMatches, featured.id]);
+  const dayList = day === "today" ? today : day === "tomorrow" ? tomorrow : day === "week" ? week : teamMatches;
+  const list = useMemo(() => applyHomeFilter(dayList, filter), [dayList, filter]);
 
-  const tabs: TabOption<TabKey>[] = [
+  const dayTabs: TabOption<DayKey>[] = [
     { key: "today", label: "Aujourd'hui", count: today.length },
     { key: "tomorrow", label: "Demain", count: tomorrow.length },
     { key: "week", label: "Cette semaine", count: week.length },
@@ -60,33 +72,29 @@ export default function RadarPage() {
     <AppShell>
       {/* ─── Hero ─── */}
       <section className="relative -mx-4 overflow-hidden px-4 pb-2 pt-2">
-        <RadarBackground accent="hype" className="opacity-90" />
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="relative"
-        >
-          <div className="inline-flex items-center gap-2 rounded-full border border-hype/25 bg-hype/8 px-3 py-1">
-            <span className="text-base">{ACTIVE_EVENT.emoji}</span>
-            <span className="text-[11px] font-bold uppercase tracking-wide text-hype">
-              Coupe du Monde · En direct
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }} className="relative">
+          <div className="mb-3 flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-hype/25 bg-hype/8 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-hype">
+              <span className="h-1.5 w-1.5 animate-pulse-dot rounded-full bg-hype" /> 🏆 Coupe du Monde · En direct
             </span>
           </div>
 
-          <h1 className="mt-3 font-display text-[28px] font-bold leading-[1.1] tracking-tight text-ink">
-            Quels matchs <span className="text-gradient-hype">regarder</span> aujourd'hui ?
+          <h1 className="font-display text-[30px] font-bold leading-[1.05] tracking-tight text-ink">
+            Ce soir, tu <span className="text-gradient-hype">regardes quoi</span> ?
           </h1>
           <p className="mt-2 max-w-sm text-sm leading-snug text-muted">
-            On analyse les matchs, les enjeux et la hype pour te dire quoi ne pas rater. 104 matchs, on
-            te sort les immanquables.
+            Le radar classe les matchs par hype, enjeu et tension du marché. On te sort les affiches chaudes,
+            tu choisis ton match.
           </p>
 
-          {/* live stats */}
-          <div className="mt-4 grid grid-cols-3 gap-2">
+          <div className="mt-3.5">
+            <SportTicker />
+          </div>
+
+          <div className="mt-3 grid grid-cols-3 gap-2">
             <StatTile value={today.length} label="matchs aujourd'hui" accent="electric" />
             <StatTile value={immanquables} label="immanquables" accent="hype" />
-            <StatTile value={liveNow} label="en direct" accent="danger" pulse={liveNow > 0} />
+            <StatTile value={live.length} label="en direct" accent="danger" pulse={live.length > 0} />
           </div>
         </motion.div>
       </section>
@@ -96,17 +104,42 @@ export default function RadarPage() {
         <EventSwitcher activeId="wc" />
       </div>
 
-      {/* ─── Match du jour ─── */}
+      {/* ─── En direct ─── */}
+      {live.length > 0 && (
+        <section className="mt-5">
+          <SectionTitle eyebrow="Ça se passe maintenant" title="En direct" />
+          <div className="space-y-3">
+            {live.map((m, i) => (
+              <LiveMatchCard key={m.id} match={m} index={i} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ─── Affiche du jour ─── */}
       <section className="mt-5">
+        <SectionTitle eyebrow="Le verdict du radar" title="Le match à ne pas rater" />
+        <HotMatchHero match={affiche} eyebrow="Le match à ne pas rater ce soir" />
+      </section>
+
+      {/* ─── Hot Board ─── */}
+      <section className="mt-7">
         <SectionTitle
-          eyebrow="Le verdict du radar"
-          title="Le match à ne pas rater"
+          eyebrow="Le classement du jour"
+          title="Les plus chauds du jour"
+          action={<span className="text-[11px] font-bold uppercase tracking-wide text-faint">Hot Board</span>}
         />
-        <FeaturedMatchCard match={featured} />
+        <DailyHotBoard />
+      </section>
+
+      {/* ─── Market Pulse ─── */}
+      <section className="mt-7">
+        <SectionTitle eyebrow="Cotes indicatives" title="Le marché chauffe" />
+        <HotMarketSection />
       </section>
 
       {/* ─── Programme ─── */}
-      <section className="mt-6">
+      <section className="mt-7">
         <SectionTitle
           eyebrow="Le programme"
           title="Tous les matchs"
@@ -116,67 +149,62 @@ export default function RadarPage() {
             </Link>
           }
         />
-        <Tabs options={tabs} value={tab} onChange={setTab} className="mb-3" />
+        <Tabs options={dayTabs} value={day} onChange={(d) => { setDay(d); }} className="mb-2.5" />
 
-        {list.length > 0 ? (
-          <div className="space-y-3">
-            {list.map((m, i) => (
-              <MatchCard key={m.id} match={m} index={i} />
-            ))}
+        {/* filter chips */}
+        <div className="-mx-4 mask-fade-x">
+          <div className="no-scrollbar flex gap-1.5 overflow-x-auto px-4 pb-1">
+            {FILTERS.map((f) => {
+              const active = filter === f.key;
+              return (
+                <button
+                  key={f.key}
+                  type="button"
+                  onClick={() => setFilter(f.key)}
+                  className={cn(
+                    "tap shrink-0 rounded-full border px-3 py-1.5 text-[12px] font-bold transition-all",
+                    active ? "border-hype/45 bg-hype/15 text-hype shadow-glow-hype" : "border-line/10 bg-surface/40 text-muted hover:text-ink",
+                  )}
+                >
+                  {f.label}
+                </button>
+              );
+            })}
           </div>
-        ) : tab === "teams" ? (
-          <EmptyState
-            icon={Star}
-            title="Aucune équipe favorite"
-            description="Choisis tes équipes pour voir leurs matchs ici en priorité."
-            action={
-              <Link
-                href="/favorites"
-                className="tap inline-flex h-10 items-center gap-2 rounded-2xl bg-hype px-4 text-sm font-bold text-bg shadow-glow-hype"
-              >
-                Choisir mes équipes <ArrowRight size={16} />
-              </Link>
-            }
-          />
-        ) : (
-          <EmptyState icon={Radar} title="Rien à signaler" description="Pas de match sur ce créneau. Reviens vite, le radar tourne." />
-        )}
+        </div>
+
+        <div className="mt-3 space-y-3">
+          {list.length > 0 ? (
+            list.map((m, i) => <MatchCard key={m.id} match={m} index={i} />)
+          ) : day === "teams" && teamMatches.length === 0 ? (
+            <EmptyState
+              icon={Star}
+              title="Aucune équipe favorite"
+              description="Choisis tes équipes pour voir leurs matchs ici en priorité."
+              action={
+                <Link href="/favorites" className="tap inline-flex h-10 items-center gap-2 rounded-2xl bg-hype px-4 text-sm font-bold text-bg shadow-glow-hype">
+                  Choisir mes équipes <ArrowRight size={16} />
+                </Link>
+              }
+            />
+          ) : (
+            <EmptyState icon={Radar} title="Aucun match sur ce filtre" description="Change de filtre ou de jour, le radar a forcément quelque chose pour toi." />
+          )}
+        </div>
       </section>
 
       {/* ─── Teasers ─── */}
-      <section className="mt-6 grid grid-cols-1 gap-3">
-        <TeaserCard
-          href="/brief"
-          icon={Newspaper}
-          accent="hype"
-          title="Le brief du jour"
-          subtitle="3 matchs, 1 immanquable, 1 verdict. Prêt à envoyer dans ton groupe."
-        />
-        <TeaserCard
-          href="/events"
-          icon={Rocket}
-          accent="violet"
-          title="Coupe du Monde maintenant. Wimbledon ensuite."
-          subtitle="Active les prochains radars : F1, UFC, Tour de France, NBA, Ligue des Champions."
-        />
+      <section className="mt-7 grid grid-cols-1 gap-3">
+        <TeaserCard href="/brief" icon={Newspaper} accent="hype" title="Le brief du jour" subtitle="3 matchs, 1 immanquable, 1 verdict. Prêt à envoyer dans ton groupe." />
+        <TeaserCard href="/events" icon={Rocket} accent="violet" title="Coupe du Monde maintenant. Wimbledon ensuite." subtitle="Active les prochains radars : F1, UFC, Tour de France, NBA, Ligue des Champions." />
       </section>
     </AppShell>
   );
 }
 
-function StatTile({
-  value,
-  label,
-  accent,
-  pulse,
-}: {
-  value: number;
-  label: string;
-  accent: "hype" | "electric" | "danger";
-  pulse?: boolean;
-}) {
+function StatTile({ value, label, accent, pulse }: { value: number; label: string; accent: "hype" | "electric" | "danger"; pulse?: boolean }) {
   return (
-    <div className="glass rounded-2xl px-2.5 py-2.5">
+    <div className="card-arcade rounded-2xl px-2.5 py-2.5">
       <div className="flex items-center gap-1.5">
         {pulse && (
           <span className="relative flex h-2 w-2">
@@ -193,30 +221,12 @@ function StatTile({
   );
 }
 
-function TeaserCard({
-  href,
-  icon: Icon,
-  title,
-  subtitle,
-  accent,
-}: {
-  href: string;
-  icon: typeof Newspaper;
-  title: string;
-  subtitle: string;
-  accent: "hype" | "violet";
-}) {
+function TeaserCard({ href, icon: Icon, title, subtitle, accent }: { href: string; icon: typeof Newspaper; title: string; subtitle: string; accent: "hype" | "violet" }) {
   return (
     <Link href={href} className="tap group block">
       <div className="glass relative flex items-center gap-3 overflow-hidden rounded-3xl p-4">
-        <span
-          className="pointer-events-none absolute inset-x-0 top-0 h-px"
-          style={{ background: `linear-gradient(90deg, transparent, rgb(var(--${accent}) / 0.6), transparent)` }}
-        />
-        <span
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ring-1 ring-line/10"
-          style={{ background: `rgb(var(--${accent}) / 0.12)`, color: `rgb(var(--${accent}))` }}
-        >
+        <span className="pointer-events-none absolute inset-x-0 top-0 h-px" style={{ background: `linear-gradient(90deg, transparent, rgb(var(--${accent}) / 0.6), transparent)` }} />
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ring-1 ring-line/10" style={{ background: `rgb(var(--${accent}) / 0.12)`, color: `rgb(var(--${accent}))` }}>
           <Icon size={20} />
         </span>
         <div className="min-w-0 flex-1">

@@ -55,6 +55,19 @@ export function SportEventCard({ event, index = 0 }: { event: SportEvent; index?
         </div>
       </div>
 
+      {/* what the radar will detect */}
+      <div className="relative mt-3 rounded-2xl border border-line/8 bg-bg/30 p-2.5">
+        <p className="mb-1.5 text-[9.5px] font-bold uppercase tracking-wide text-faint">Ce que le radar va détecter</p>
+        <ul className="grid grid-cols-1 gap-1">
+          {event.bullets.map((b) => (
+            <li key={b} className="flex items-center gap-1.5 text-[11.5px] text-muted">
+              <span className="h-1 w-1 shrink-0 rounded-full" style={{ background: `rgb(var(--${accent}))` }} />
+              {b}
+            </li>
+          ))}
+        </ul>
+      </div>
+
       <button
         type="button"
         onClick={() => {
